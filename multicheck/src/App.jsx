@@ -1,4 +1,3 @@
-import Checkbox from "./Checkbox";
 import Multicheck from "./Multicheck";
 
 function App() {
