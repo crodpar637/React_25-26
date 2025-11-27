@@ -3,7 +3,7 @@
 ## React.js
 
 ### Crear plantilla de proyecto Vite con React
-npm create vite@latest nombre_proyecto --template react
+npm create vite@latest nombre_proyecto -- --template react
 
 cd nombre_proyecto
 npm install
