@@ -1,11 +1,11 @@
-import CategoriasChistes from "./CategoriasChistes"
+import VisorChistes from "./VisorChistes"
 
 function App() {
   
 
   return (
     <>
-      <CategoriasChistes/>
+      <VisorChistes/>
     </>
   )
 }

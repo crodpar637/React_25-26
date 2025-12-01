@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function CategoriasChistes() {
+function CategoriasChistes({ handler }) {
   const [isLoading, setIsLoading] = useState(true);
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState(null);
@@ -17,8 +17,9 @@ function CategoriasChistes() {
 
         // Actualizamos el array de categorias
         setCategorias(arrayCategorias);
-        if(arrayCategorias.lenght > 0){
-            setCategoriaSeleccionada(arrayCategorias[0]);
+        if (arrayCategorias.length > 0) {
+          setCategoriaSeleccionada(arrayCategorias[0]);
+          handler(arrayCategorias[0]);
         }
         // Ya no estamos cargando
         setIsLoading(false);
@@ -26,8 +27,8 @@ function CategoriasChistes() {
         setError(null);
       } catch (e) {
         setError("No se pudo conectar al servidor");
-        setIsLoading(false);
       }
+       setIsLoading(false);
     }
 
     if (isLoading) fetch_categorias();
@@ -52,7 +53,10 @@ function CategoriasChistes() {
         <select
           name="categoriaChistes"
           value={categoriaSeleccionada}
-          onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+          onChange={(e) => {
+            setCategoriaSeleccionada(e.target.value);
+            handler(e.target.value);
+          }}
         >
           {categorias.map((item) => (
             <option key={item} value={item}>
