@@ -3,14 +3,18 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
+import { useState } from "react";
 
-function Pokecard({datos}) {
+function Pokecard({ datos }) {
+  const [imagen, setImagen] = useState(datos.sprites.front_default);
 
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
         sx={{ height: 140 }}
-        image={datos.sprites.front_default}
+        image={imagen}
+        onMouseEnter={() => setImagen(datos.sprites.front_shiny)}
+        onMouseLeave={() => setImagen(datos.sprites.front_default)}
         title={datos.name}
       />
       <CardContent>

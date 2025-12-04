@@ -39,7 +39,7 @@ function App() {
           setDatos(null);
         }
       } catch (e) {
-        setError("No se pudo conectar al servidor");
+        setError("No se pudo conectar al servidor: " + e.toString() );
         setDatos(null);
       }
       setIsLoading(false);
