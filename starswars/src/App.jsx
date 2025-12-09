@@ -1,0 +1,20 @@
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+
+import PersonPage from './PersonPage';
+
+/**
+ * Componente principal de la aplicación.
+ * @component
+ */
+function App() {
+  return (
+    <>
+      <PersonPage />
+    </>
+  )
+}
+
+export default App;

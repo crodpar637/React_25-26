@@ -3,10 +3,15 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Pokecard({ datos }) {
   const [imagen, setImagen] = useState(datos.sprites.front_default);
+  
+  // Cuando cambie "datos", actualizamos la imagen
+  useEffect(() => {
+    setImagen(datos.sprites.front_default);
+  }, [datos]);
 
   return (
     <Card sx={{ maxWidth: 345 }}>
