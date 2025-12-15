@@ -8,27 +8,34 @@ const router = createBrowserRouter([
   {
     path: "/",
     Component: Home,
-    children: [ // Todo esto se ve en el Outlet
-      {index:true, Component: Inicio }, // Esto se ve en la ruta padre
+    children: [
+      // Todo esto se ve en el Outlet
+      { index: true, Component: Inicio }, // Esto se ve en la ruta padre
       {
         path: "/directors",
         element: <h1>Listado de directores</h1>,
       },
       {
+        path: "/directors/new",
+        element: <h1>Alta de directores</h1>,
+      },
+      {
         path: "/movies",
         element: <h1>Listado de peliculas</h1>,
+      },
+      {
+        path: "/movies/new",
+        element: <h1>Alta de peliculas</h1>,
       },
     ],
   },
 ]);
 function App() {
-  
-
   return (
     <>
       <RouterProvider router={router} />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

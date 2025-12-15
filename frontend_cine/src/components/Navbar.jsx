@@ -7,75 +7,58 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 import MovieTwoToneIcon from "@mui/icons-material/MovieTwoTone";
-
-const pages = ["Products", "Pricing", "Blog"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+import { Link } from "react-router";
+import Divider from "@mui/material/Divider";
+import ListSubheader from "@mui/material/ListSubheader";
 
 function Navbar() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anclaMenuDirectores, setAnclaMenuDirectores] = React.useState(null);
+  const [anclaMenuPeliculas, setAnclaMenuPeliculas] = React.useState(null);
+  const [anclaMenuXS, setAnclaMenuXS] = React.useState(null);
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
+  const handleClickMenuDirectores = (event) => {
+    setAnclaMenuDirectores(event.currentTarget);
   };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
+
+  const handleClickMenuPeliculas = (event) => {
+    setAnclaMenuPeliculas(event.currentTarget);
+  };
+
+  const handleClickMenuXS = (event) => {
+    setAnclaMenuXS(event.currentTarget);
   };
 
   const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+    setAnclaMenuDirectores(null);
+    setAnclaMenuPeliculas(null);
+    setAnclaMenuXS(null);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  const linkStyle = { color: "black", textDecoration: "none" };
 
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <MovieTwoToneIcon
-            sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
-          />
-
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            MOVIES DB
-          </Typography>
-
+          {/* Menú para resolución xs  */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label="menu movies db resolucion xs"
               aria-controls="menu-appbar"
               aria-haspopup="true"
-              onClick={handleOpenNavMenu}
+              onClick={handleClickMenuXS}
               color="inherit"
             >
               <MenuIcon />
             </IconButton>
             <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
+              id="menu-appbar-xs"
+              anchorEl={anclaMenuXS}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "left",
@@ -85,30 +68,53 @@ function Navbar() {
                 vertical: "top",
                 horizontal: "left",
               }}
-              open={Boolean(anchorElNav)}
+              open={Boolean(anclaMenuXS)}
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: "block", md: "none" } }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: "center" }}>{page}</Typography>
-                </MenuItem>
-              ))}
+              <ListSubheader>Menú Directores</ListSubheader>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors/new" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Alta de directores
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Listado de directores
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <Divider />
+              <ListSubheader>Menú Películas</ListSubheader>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/movies/new" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Alta de peliculas
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/movies" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Listado de peliculas
+                  </Typography>
+                </Link>
+              </MenuItem>
             </Menu>
           </Box>
 
-          <MovieTwoToneIcon
-            sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}
-          />
+          {/* Logo y nombre de la web */}
+          <MovieTwoToneIcon />
           <Typography
-            variant="h5"
+            variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
+              mx: 2,
               fontFamily: "monospace",
               fontWeight: 700,
               letterSpacing: ".3rem",
@@ -118,18 +124,86 @@ function Navbar() {
           >
             MOVIES DB
           </Typography>
+
+          {/* Menú para resolución md */}
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                {page}
-              </Button>
-            ))}
+            {/* Menú para directores en md */}
+            <Button
+              onClick={handleClickMenuDirectores}
+              sx={{ my: 2, color: "white", display: "block" }}
+            >
+              Directores
+            </Button>
+            <Menu
+              id="menu-directores"
+              anchorEl={anclaMenuDirectores}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              open={Boolean(anclaMenuDirectores)}
+              onClose={handleCloseNavMenu}
+              sx={{ display: { xs: "none", md: "flex" } }}
+            >
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors/new" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Alta de directores
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Listado de directores
+                  </Typography>
+                </Link>
+              </MenuItem>
+            </Menu>
+            {/* Menú para peliculas en md */}
+            <Button
+              onClick={handleClickMenuPeliculas}
+              sx={{ my: 2, color: "white", display: "block" }}
+            >
+              Peliculas
+            </Button>
+            <Menu
+              id="menu-peliculas"
+              anchorEl={anclaMenuPeliculas}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              open={Boolean(anclaMenuPeliculas)}
+              onClose={handleCloseNavMenu}
+              sx={{ display: { xs: "none", md: "flex" } }}
+            >
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/movies/new" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Alta de peliculas
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/movies" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Listado de peliculas
+                  </Typography>
+                </Link>
+              </MenuItem>
+            </Menu>
           </Box>
-        
         </Toolbar>
       </Container>
     </AppBar>
