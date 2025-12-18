@@ -1,7 +1,9 @@
 import { RouterProvider } from "react-router/dom";
 import { createBrowserRouter } from "react-router";
+
 import Inicio from "./components/Inicio";
 import ListadoDirectores from "./components/ListadoDirectores";
+import AltaDirector from "./components/AltaDirector";
 
 import Home from "./pages/Home";
 
@@ -18,7 +20,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/directors/new",
-        element: <h1>Alta de directores</h1>,
+        element: <AltaDirector />,
       },
       {
         path: "/movies",

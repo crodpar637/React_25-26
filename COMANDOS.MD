@@ -30,6 +30,9 @@ import '@fontsource/roboto/700.css';
 ### Material icons MUI
 npm install @mui/icons-material
 
+### Trabajar con componentes de fechas
+npm install  @mui/x-date-pickers dayjs
+
 ### Instalar libreria MDBootstrap para React
 npm install mdb-react-ui-kit
 npm install @fortawesome/fontawesome-free

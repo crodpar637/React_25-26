@@ -51,14 +51,14 @@ function ListadoDirectores() {
 
   return (
     <>
-      <Typography variant="h3">Listado de directores</Typography>
+      <Typography variant="h4" align="center" sx={{my: 3}}>Listado de directores</Typography>
 
       <TableContainer component={Paper}>
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
-              <TableCell>Fecha nacimiento</TableCell>
+              <TableCell align="center">Fecha nacimiento</TableCell>
               <TableCell>Biografía</TableCell>
               <TableCell>Fotografía</TableCell>
             </TableRow>
@@ -67,7 +67,7 @@ function ListadoDirectores() {
             {datos.map((row) => (
               <TableRow key={row.id_director}>
                 <TableCell>{row.name}</TableCell>
-                <TableCell>{row.birth_date}</TableCell>
+                <TableCell align="center">{row.birth_date}</TableCell>
                 <TableCell>{row.biography}</TableCell>
                 <TableCell>
                   <Avatar alt={row.name} src={row.photo_url} />
