@@ -56,12 +56,14 @@ function AltaDirector() {
           setDialogSeverity("success"); // Color verde
           setOpenDialog(true); // Abrir el diálogo
         } else {
+          console.error(`Error ${response.status}:`, response.statusText);
           setDialogMessage("Error del servidor"); // Mensaje
           setDialogSeverity("error"); // Color rojo
           setOpenDialog(true); // Abrir el diálogo
         }
       } catch (e) {
-        setDialogMessage("Error de conexión");
+        console.error("Error en fetch:", e); // para debugging
+        setDialogMessage(`Error de conexión: ${e.message || "desconocido"}`);
         setDialogSeverity("error");
         setOpenDialog(true);
       }
@@ -78,7 +80,7 @@ function AltaDirector() {
 
   function handleClick() {
     // evitar envíos duplicados por pulsar el botón tras el mensaje de inserción correcta
-    if (isUpdating) return; 
+    if (isUpdating) return;
 
     if (validarDatos()) {
       setIsUpdating(true);
@@ -283,7 +285,6 @@ function AltaDirector() {
         </Grid>
       </Grid>
 
-
       <Dialog
         open={openDialog}
         onClose={handleDialogClose}
@@ -291,7 +292,7 @@ function AltaDirector() {
         aria-labelledby="result-dialog-title"
       >
         <DialogTitle id="result-dialog-title">
-          {dialogSeverity === 'success' ? 'Operación correcta' : 'Error'}
+          {dialogSeverity === "success" ? "Operación correcta" : "Error"}
         </DialogTitle>
         <DialogContent dividers>
           <Alert severity={dialogSeverity} variant="filled">
