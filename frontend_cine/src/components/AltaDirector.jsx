@@ -5,7 +5,14 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
+
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -28,6 +35,9 @@ function AltaDirector() {
     photo_url: true,
   });
   const [isUpdating, setIsUpdating] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
+  const [dialogSeverity, setDialogSeverity] = useState("success");
 
   useEffect(() => {
     async function fetchCreateDirector() {
@@ -35,20 +45,25 @@ function AltaDirector() {
         const response = await fetch("http://localhost:3000/api/directors/", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json", // Tipo del contenido a enviar
           },
           body: JSON.stringify(director), // datos a enviar
         });
 
         if (response.ok) {
-          let respuesta  = await response.json();
-            alert(respuesta.mensaje); // Mejorar con modal/dialogo
-            navigate("/"); // Todo bien, navegamos a la ruta raiz
+          let respuesta = await response.json();
+          setDialogMessage(respuesta.mensaje); // Mensaje
+          setDialogSeverity("success"); // Color verde
+          setOpenDialog(true); // Abrir el diálogo
         } else {
-            alert("Error del servidor"); // Mejorar con modal/dialogo
+          setDialogMessage("Error del servidor"); // Mensaje
+          setDialogSeverity("error"); // Color rojo
+          setOpenDialog(true); // Abrir el diálogo
         }
       } catch (e) {
-         alert("Excepcion"); // Mejorar con modal/dialogo
+        setDialogMessage("Error de conexión");
+        setDialogSeverity("error");
+        setOpenDialog(true);
       }
       // Pase lo que pase hemos terminado el proceso de actualización
       setIsUpdating(false);
@@ -62,9 +77,22 @@ function AltaDirector() {
   }
 
   function handleClick() {
+    // evitar envíos duplicados por pulsar el botón tras el mensaje de inserción correcta
+    if (isUpdating) return; 
+
     if (validarDatos()) {
       setIsUpdating(true);
     }
+  }
+
+  function handleDialogClose(e, reason) {
+    if (reason === "backdropClick" || reason === "escapeKeyDown") return;
+    setOpenDialog(false);
+  }
+
+  function handleDialogConfirm() {
+    setOpenDialog(false);
+    if (dialogSeverity === "success") navigate("/");
   }
 
   function validarDatos() {
@@ -99,6 +127,7 @@ function AltaDirector() {
       valido = false;
       objetoValidacion.birth_date = false;
     }
+    // Actualizamos con los campos correctos e incorrectos
     setIsCamposValidos(objetoValidacion);
 
     return valido;
@@ -253,6 +282,26 @@ function AltaDirector() {
           </Paper>
         </Grid>
       </Grid>
+
+
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        disableEscapeKeyDown
+        aria-labelledby="result-dialog-title"
+      >
+        <DialogTitle id="result-dialog-title">
+          {dialogSeverity === 'success' ? 'Operación correcta' : 'Error'}
+        </DialogTitle>
+        <DialogContent dividers>
+          <Alert severity={dialogSeverity} variant="filled">
+            {dialogMessage}
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogConfirm}>OK</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
