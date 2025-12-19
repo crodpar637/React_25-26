@@ -10,8 +10,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -87,13 +85,9 @@ function AltaDirector() {
     }
   }
 
-  function handleDialogClose(e, reason) {
-    if (reason === "backdropClick" || reason === "escapeKeyDown") return;
+  function handleDialogClose() {
     setOpenDialog(false);
-  }
 
-  function handleDialogConfirm() {
-    setOpenDialog(false);
     if (dialogSeverity === "success") navigate("/");
   }
 
@@ -300,7 +294,7 @@ function AltaDirector() {
           </Alert>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogConfirm}>OK</Button>
+          <Button onClick={handleDialogClose}>OK</Button>
         </DialogActions>
       </Dialog>
     </>
