@@ -54,7 +54,7 @@ function ListadoDirectores() {
       <Typography variant="h4" align="center" sx={{my: 3}}>Listado de directores</Typography>
 
       <TableContainer component={Paper}>
-        <Table aria-label="simple table">
+        <Table stickyHeader ria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
