@@ -17,6 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+import api from "../api";
 
 function AltaDirector() {
   const navigate = useNavigate();
@@ -40,30 +41,16 @@ function AltaDirector() {
   useEffect(() => {
     async function fetchCreateDirector() {
       try {
-        const response = await fetch("http://localhost:3000/api/directors/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json", // Tipo del contenido a enviar
-          },
-          body: JSON.stringify(director), // datos a enviar
-        });
-
-        if (response.ok) {
-          let respuesta = await response.json();
-          setDialogMessage(respuesta.mensaje); // Mensaje
-          setDialogSeverity("success"); // Color verde
-          setOpenDialog(true); // Abrir el diálogo
-        } else {
-          console.error(`Error ${response.status}:`, response.statusText);
-          setDialogMessage("Error del servidor"); // Mensaje
-          setDialogSeverity("error"); // Color rojo
-          setOpenDialog(true); // Abrir el diálogo
-        }
-      } catch (e) {
-        console.error("Error en fetch:", e); // para debugging
-        setDialogMessage(`Error de conexión: ${e.message || "desconocido"}`);
-        setDialogSeverity("error");
-        setOpenDialog(true);
+        const respuesta = await api.post("/directors/", director);
+        
+        setDialogMessage(respuesta.mensaje); // Mensaje
+        setDialogSeverity("success"); // Color verde
+        setOpenDialog(true); // Abrir el diálogo
+      } catch (error) {
+        console.error("Error en axios:", error);
+        setDialogMessage(error.mensaje || "Error al crear el director");
+        setDialogSeverity("error"); // Color rojo
+        setOpenDialog(true); // Abrir el diálogo
       }
       // Pase lo que pase hemos terminado el proceso de actualización
       setIsUpdating(false);

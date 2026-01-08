@@ -8,6 +8,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
+import api from "../api";
 
 function ListadoDirectores() {
   const [datos, setDatos] = useState([]);
@@ -16,23 +17,16 @@ function ListadoDirectores() {
   useEffect(() => {
     async function fetchDirectores() {
       try {
-        let response = await fetch("http://localhost:3000/api/directors/");
+        const respuesta = await api.get("/directors/");
+        
+        // Actualizamos los datos de directores
+        setDatos(respuesta.datos);
 
-        if (response.ok) {
-          let datosDirectores = await response.json();
-
-          // Actualizamos los datos de directores
-          setDatos(datosDirectores.datos);
-
-          // Y no tenemos errores
-          setError(null);
-        } else {
-          setError("Respuesta errónea del servidor.");
-          setDatos(null);
-        }
-      } catch (e) {
-        setError("No se pudo conectar al servidor: " + e.toString());
-        setDatos(null);
+        // Y no tenemos errores
+        setError(null);
+      } catch (error) {
+        setError(error.mensaje || "No se pudo conectar al servidor");
+        setDatos([]);
       }
     }
 
@@ -44,6 +38,16 @@ function ListadoDirectores() {
       <>
         <Typography variant="h5" align="center" sx={{ mt: 3 }}>
           {error}
+        </Typography>
+      </>
+    );
+  }
+
+  if (!datos || datos.length === 0) {
+    return (
+      <>
+        <Typography variant="h5" align="center" sx={{ mt: 3 }}>
+          No hay directores disponibles
         </Typography>
       </>
     );
