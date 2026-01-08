@@ -8,6 +8,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/Delete";
 import api from "../api";
 
 function ListadoDirectores() {
@@ -18,7 +20,7 @@ function ListadoDirectores() {
     async function fetchDirectores() {
       try {
         const respuesta = await api.get("/directors/");
-        
+
         // Actualizamos los datos de directores
         setDatos(respuesta.datos);
 
@@ -32,6 +34,23 @@ function ListadoDirectores() {
 
     fetchDirectores();
   }, []);
+
+  async function handleDelete(id_director) {
+    try {
+      await api.delete("/directors/" + id_director);
+
+      const datos_nuevos = datos.filter( director => director.id_director != id_director);
+
+      // Actualizamos los datos de directores sin el que hemos borrado
+      setDatos(datos_nuevos);
+
+      // Y no tenemos errores
+      setError(null);
+    } catch (error) {
+      setError(error.mensaje || "No se pudo conectar al servidor");
+      setDatos([]);
+    }
+  }
 
   if (error != null) {
     return (
@@ -55,7 +74,9 @@ function ListadoDirectores() {
 
   return (
     <>
-      <Typography variant="h4" align="center" sx={{my: 3}}>Listado de directores</Typography>
+      <Typography variant="h4" align="center" sx={{ my: 3 }}>
+        Listado de directores
+      </Typography>
 
       <TableContainer component={Paper}>
         <Table stickyHeader ria-label="simple table">
@@ -65,6 +86,7 @@ function ListadoDirectores() {
               <TableCell align="center">Fecha nacimiento</TableCell>
               <TableCell>Biografía</TableCell>
               <TableCell>Fotografía</TableCell>
+              <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -72,9 +94,27 @@ function ListadoDirectores() {
               <TableRow key={row.id_director}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell align="center">{row.birth_date}</TableCell>
-                <TableCell>{row.biography}</TableCell>
+                <TableCell
+                  sx={{
+                    maxWidth: "500px",
+                    textWrap: "wrap",
+                    overflow: "hidden",
+                  }}
+                >
+                  {row.biography}
+                </TableCell>
                 <TableCell>
                   <Avatar alt={row.name} src={row.photo_url} />
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => handleDelete(row.id_director)}
+                  >
+                    <DeleteIcon />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

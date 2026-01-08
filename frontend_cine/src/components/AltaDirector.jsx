@@ -47,7 +47,6 @@ function AltaDirector() {
         setDialogSeverity("success"); // Color verde
         setOpenDialog(true); // Abrir el diálogo
       } catch (error) {
-        console.error("Error en axios:", error);
         setDialogMessage(error.mensaje || "Error al crear el director");
         setDialogSeverity("error"); // Color rojo
         setOpenDialog(true); // Abrir el diálogo
