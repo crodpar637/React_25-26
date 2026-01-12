@@ -10,11 +10,14 @@ import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import api from "../api";
+import { useNavigate } from "react-router-dom";
 
 function ListadoDirectores() {
   const [datos, setDatos] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchDirectores() {
@@ -107,13 +110,20 @@ function ListadoDirectores() {
                   <Avatar alt={row.name} src={row.photo_url} />
                 </TableCell>
                 <TableCell>
-                  {" "}
                   <Button
                     variant="contained"
                     color="error"
                     onClick={() => handleDelete(row.id_director)}
                   >
                     <DeleteIcon />
+                  </Button>
+                  <Button
+                    sx={{ml: 1}}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate('/directors/edit/' + row.id_director)}
+                  >
+                    <EditIcon />
                   </Button>
                 </TableCell>
               </TableRow>

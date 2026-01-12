@@ -4,6 +4,7 @@ import { createBrowserRouter } from "react-router";
 import Inicio from "./components/Inicio";
 import ListadoDirectores from "./components/ListadoDirectores";
 import AltaDirector from "./components/AltaDirector";
+import EditarDirector from "./components/EditarDirector"
 
 import Home from "./pages/Home";
 
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path: "/directors/new",
         element: <AltaDirector />,
+      },
+      {
+        path: "/directors/edit/:id_director",
+        element: <EditarDirector />,
       },
       {
         path: "/movies",
