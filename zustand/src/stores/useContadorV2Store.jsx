@@ -20,6 +20,7 @@ const useContadorV2Store = create(
     persist(
       (set) => ({
         count: 0,
+        nombre: 'Carlos',
         increase: () => set((state) => ({ count: state.count + 1 })),
         decrease: () => set((state) => ({ count: state.count - 1 }))
       }),

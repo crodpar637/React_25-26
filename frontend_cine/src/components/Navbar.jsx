@@ -87,6 +87,20 @@ function Navbar() {
                   </Typography>
                 </Link>
               </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors/cards" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Listado de tarjetas de directores
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors/filter" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Directores con filtros
+                  </Typography>
+                </Link>
+              </MenuItem>
               <Divider />
               <ListSubheader>Menú Películas</ListSubheader>
               <MenuItem onClick={handleCloseNavMenu}>
@@ -100,6 +114,13 @@ function Navbar() {
                 <Link to="/movies" style={linkStyle}>
                   <Typography sx={{ textAlign: "center" }}>
                     Listado de peliculas
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/movies/filter" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Películas con filtros
                   </Typography>
                 </Link>
               </MenuItem>
@@ -164,6 +185,20 @@ function Navbar() {
                   </Typography>
                 </Link>
               </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors/cards" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Listado de tarjetas de directores
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors/filter" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Directores con filtros
+                  </Typography>
+                </Link>
+              </MenuItem>
             </Menu>
             {/* Menú para peliculas en md */}
             <Button
@@ -199,6 +234,13 @@ function Navbar() {
                 <Link to="/movies" style={linkStyle}>
                   <Typography sx={{ textAlign: "center" }}>
                     Listado de peliculas
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/movies/filter" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Películas con filtros
                   </Typography>
                 </Link>
               </MenuItem>
