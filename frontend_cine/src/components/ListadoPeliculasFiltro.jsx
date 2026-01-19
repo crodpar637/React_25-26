@@ -11,6 +11,8 @@ import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ClearIcon from "@mui/icons-material/Clear";
+import DownloadIcon from "@mui/icons-material/Download";
+import Fab from "@mui/material/Fab";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import {
@@ -20,7 +22,10 @@ import {
   Grid,
   Card,
   CardContent,
+  Stack,
 } from "@mui/material";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import ListadoPeliculasFiltroPDF from "./ListadoPeliculasFiltroPDF";
 
 function ListadoPeliculasFiltro() {
   const [datos, setDatos] = useState([]);
@@ -218,27 +223,62 @@ function ListadoPeliculasFiltro() {
                     {row.synopsis}
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={() => handleDelete(row.id_movie)}
+                    <Stack
+                      sx={{ width: "100%" }}
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1}
+                      justifyContent="center"
+                      alignItems="center"
                     >
-                      <DeleteIcon />
-                    </Button>
-                    <Button
-                      sx={{ ml: 1 }}
-                      variant="contained"
-                      color="primary"
-                      onClick={() => navigate("/movies/edit/" + row.id_movie)}
-                    >
-                      <EditIcon />
-                    </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDelete(row.id_movie)}
+                      >
+                        <DeleteIcon />
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => navigate("/movies/edit/" + row.id_movie)}
+                      >
+                        <EditIcon />
+                      </Button>
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+      )}
+
+      {datosFiltrados && datosFiltrados.length > 0 && (
+        <Fab
+          aria-label="descargar"
+          sx={{
+            position: "fixed",
+            top: 85,
+            right: 20,
+          }}
+        >
+          <PDFDownloadLink
+            document={
+              <ListadoPeliculasFiltroPDF data={datosFiltrados} />
+            }
+            fileName="peliculas.pdf"
+          >
+            {({ loading }) => (
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {loading ? (
+                  <Typography sx={{ fontSize: 12 }}>...</Typography>
+                ) : (
+                  <DownloadIcon />
+                )}
+              </Box>
+            )}
+          </PDFDownloadLink>
+        </Fab>
       )}
     </>
   );

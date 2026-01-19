@@ -1,13 +1,15 @@
+import PrintIcon from "@mui/icons-material/Print";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
+import Fab from "@mui/material/Fab";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api";
-import Button from "@mui/material/Button";
 
 function ListadoCardsDirectores() {
   const [datos, setDatos] = useState([]);
@@ -111,6 +113,18 @@ function ListadoCardsDirectores() {
           </Grid>
         ))}
       </Grid>
+       <Fab
+        color="secondary"
+        aria-label="imprimir"
+        onClick={() => window.print()}
+        sx={{
+          position: "fixed",
+          top: 85,
+          right: 20,
+        }}
+      >
+        <PrintIcon />
+      </Fab>
     </>
   );
 }

@@ -10,8 +10,12 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import PrintIcon from "@mui/icons-material/Print";
+import Fab from "@mui/material/Fab";
+import { Stack, Box } from "@mui/material";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
+import generatePDF from "../utils/generatePDF";
 
 function ListadoPeliculas() {
   const [datos, setDatos] = useState([]);
@@ -81,11 +85,12 @@ function ListadoPeliculas() {
 
   return (
     <>
-      <Typography variant="h4" align="center" sx={{ my: 3 }}>
-        Listado de películas
-      </Typography>
+      <Box id="pdf-content">
+        <Typography variant="h4" align="center" sx={{ my: 3 }}>
+          Listado de películas
+        </Typography>
 
-      <TableContainer component={Paper}>
+        <TableContainer component={Paper}>
         <Table stickyHeader aria-label="películas table">
           <TableHead>
             <TableRow>
@@ -93,7 +98,7 @@ function ListadoPeliculas() {
               <TableCell align="center">Fecha de lanzamiento</TableCell>
               <TableCell>Director</TableCell>
               <TableCell>Sinopsis</TableCell>
-              <TableCell>Acciones</TableCell>
+              <TableCell align="center">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -112,27 +117,49 @@ function ListadoPeliculas() {
                   {row.synopsis}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDelete(row.id_movie)}
+                  <Stack
+                    sx={{ width: "100%" }}
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1}
+                    justifyContent="center"
+                    alignItems="center"
                   >
-                    <DeleteIcon />
-                  </Button>
-                  <Button
-                    sx={{ ml: 1 }}
-                    variant="contained"
-                    color="primary"
-                    onClick={() => navigate("/movies/edit/" + row.id_movie)}
-                  >
-                    <EditIcon />
-                  </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleDelete(row.id_movie)}
+                    >
+                      <DeleteIcon />
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => navigate("/movies/edit/" + row.id_movie)}
+                    >
+                      <EditIcon />
+                    </Button>
+                  </Stack>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+         </TableContainer>
+      </Box>
+
+      <Fab
+        color="secondary"
+        aria-label="imprimir"
+        onClick={() => generatePDF("pdf-content", "peliculas")}
+        sx={{
+          position: "fixed",
+          top: 85,
+          right: 20,
+        }}
+      >
+        <PrintIcon />
+      </Fab>
+     
     </>
   );
 }

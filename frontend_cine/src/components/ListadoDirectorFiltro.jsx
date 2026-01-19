@@ -12,9 +12,15 @@ import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ClearIcon from "@mui/icons-material/Clear";
+import DownloadIcon from "@mui/icons-material/Download";
 import api from "../api";
+import Fab from "@mui/material/Fab";
+import PrintIcon from "@mui/icons-material/Print";
 import { useNavigate } from "react-router-dom";
-import { TextField, Grid, Card, CardContent } from "@mui/material";
+import { TextField, Grid, Card, CardContent, Stack, Box } from "@mui/material";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import ListadoDirectoresFiltroPDF from "./ListadoDirectoresFiltroPDF";
+import generatePDF from "../utils/generatePDF";
 
 function ListadoDirectorFiltro() {
   const [datos, setDatos] = useState([]);
@@ -181,29 +187,64 @@ function ListadoDirectorFiltro() {
                     <Avatar alt={row.name} src={row.photo_url} />
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={() => handleDelete(row.id_director)}
+                    <Stack
+                      sx={{ width: "100%" }}
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1}
+                      justifyContent="center"
+                      alignItems="center"
                     >
-                      <DeleteIcon />
-                    </Button>
-                    <Button
-                      sx={{ ml: 1 }}
-                      variant="contained"
-                      color="primary"
-                      onClick={() =>
-                        navigate("/directors/edit/" + row.id_director)
-                      }
-                    >
-                      <EditIcon />
-                    </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDelete(row.id_director)}
+                      >
+                        <DeleteIcon />
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() =>
+                          navigate("/directors/edit/" + row.id_director)
+                        }
+                      >
+                        <EditIcon />
+                      </Button>
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+      )}
+
+      {datosFiltrados && datosFiltrados.length > 0 && (
+        <Fab
+          aria-label="descargar"
+          sx={{
+            position: "fixed",
+            top: 85,
+            right: 20,
+          }}
+        >
+          <PDFDownloadLink
+            document={
+              <ListadoDirectoresFiltroPDF data={datosFiltrados} />
+            }
+            fileName="directores.pdf"
+          >
+            {({ loading }) => (
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {loading ? (
+                  <Typography sx={{ fontSize: 12 }}>...</Typography>
+                ) : (
+                  <DownloadIcon />
+                )}
+              </Box>
+            )}
+          </PDFDownloadLink>
+        </Fab>
       )}
     </>
   );

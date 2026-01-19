@@ -11,8 +11,13 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import PrintIcon from "@mui/icons-material/Print";
+import Fab from "@mui/material/Fab";
+import { Stack, Box } from "@mui/material";
+
 import api from "../api";
 import { useNavigate } from "react-router-dom";
+import generatePDF from "../utils/generatePDF";
 
 function ListadoDirectores() {
   const [datos, setDatos] = useState([]);
@@ -42,7 +47,9 @@ function ListadoDirectores() {
     try {
       await api.delete("/directors/" + id_director);
 
-      const datos_nuevos = datos.filter( director => director.id_director != id_director);
+      const datos_nuevos = datos.filter(
+        (director) => director.id_director != id_director,
+      );
 
       // Actualizamos los datos de directores sin el que hemos borrado
       setDatos(datos_nuevos);
@@ -77,60 +84,86 @@ function ListadoDirectores() {
 
   return (
     <>
-      <Typography variant="h4" align="center" sx={{ my: 3 }}>
-        Listado de directores
-      </Typography>
+      <Box id="pdf-content">
+        <Typography variant="h4" align="center" sx={{ my: 3 }}>
+          Listado de directores
+        </Typography>
 
-      <TableContainer component={Paper}>
-        <Table stickyHeader ria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Nombre</TableCell>
-              <TableCell align="center">Fecha nacimiento</TableCell>
-              <TableCell>Biografía</TableCell>
-              <TableCell>Fotografía</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {datos.map((row) => (
-              <TableRow key={row.id_director}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell align="center">{row.birth_date}</TableCell>
-                <TableCell
-                  sx={{
-                    maxWidth: "500px",
-                    textWrap: "wrap",
-                    overflow: "hidden",
-                  }}
-                >
-                  {row.biography}
-                </TableCell>
-                <TableCell>
-                  <Avatar alt={row.name} src={row.photo_url} />
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDelete(row.id_director)}
-                  >
-                    <DeleteIcon />
-                  </Button>
-                  <Button
-                    sx={{ml: 1}}
-                    variant="contained"
-                    color="primary"
-                    onClick={() => navigate('/directors/edit/' + row.id_director)}
-                  >
-                    <EditIcon />
-                  </Button>
-                </TableCell>
+        <TableContainer component={Paper}>
+          <Table stickyHeader ria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Nombre</TableCell>
+                <TableCell align="center">Fecha nacimiento</TableCell>
+                <TableCell>Biografía</TableCell>
+                <TableCell>Fotografía</TableCell>
+                <TableCell align="center">Acciones</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {datos.map((row) => (
+                <TableRow key={row.id_director}>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell align="center">{row.birth_date}</TableCell>
+                  <TableCell
+                    sx={{
+                      maxWidth: "500px",
+                      textWrap: "wrap",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {row.biography}
+                  </TableCell>
+                  <TableCell>
+                    <Avatar alt={row.name} src={row.photo_url} />
+                  </TableCell>
+                  <TableCell>
+                    <Stack
+                      sx={{ width: "100%" }}
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDelete(row.id_director)}
+                      >
+                        <DeleteIcon />
+                      </Button>
+
+                      <Button
+                        sx={{ ml: 1 }}
+                        variant="contained"
+                        color="primary"
+                        onClick={() =>
+                          navigate("/directors/edit/" + row.id_director)
+                        }
+                      >
+                        <EditIcon />
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      <Fab
+        color="secondary"
+        aria-label="imprimir"
+        onClick={() => generatePDF("pdf-content", "directores")}
+        sx={{
+          position: "fixed",
+          top: 85,
+          right: 20,
+        }}
+      >
+        <PrintIcon />
+      </Fab>
     </>
   );
 }
