@@ -102,6 +102,13 @@ function Navbar() {
                   </Typography>
                 </Link>
               </MenuItem>
+               <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors/graph" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Gráficas de directores
+                  </Typography>
+                </Link>
+              </MenuItem>
               <Divider />
               <ListSubheader>Menú Películas</ListSubheader>
               <MenuItem onClick={handleCloseNavMenu}>
@@ -197,6 +204,13 @@ function Navbar() {
                 <Link to="/directors/filter" style={linkStyle}>
                   <Typography sx={{ textAlign: "center" }}>
                     Directores con filtros
+                  </Typography>
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <Link to="/directors/graph" style={linkStyle}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    Gráficas de directores
                   </Typography>
                 </Link>
               </MenuItem>

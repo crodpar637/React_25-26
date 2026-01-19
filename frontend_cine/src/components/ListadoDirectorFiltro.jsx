@@ -1,26 +1,24 @@
-import { useState, useEffect, useMemo } from "react";
+import ClearIcon from "@mui/icons-material/Clear";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
+import EditIcon from "@mui/icons-material/Edit";
+import { Box, Card, CardContent, Grid, Stack, TextField } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Fab from "@mui/material/Fab";
+import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import ClearIcon from "@mui/icons-material/Clear";
-import DownloadIcon from "@mui/icons-material/Download";
-import api from "../api";
-import Fab from "@mui/material/Fab";
-import PrintIcon from "@mui/icons-material/Print";
-import { useNavigate } from "react-router-dom";
-import { TextField, Grid, Card, CardContent, Stack, Box } from "@mui/material";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api";
 import ListadoDirectoresFiltroPDF from "./ListadoDirectoresFiltroPDF";
-import generatePDF from "../utils/generatePDF";
 
 function ListadoDirectorFiltro() {
   const [datos, setDatos] = useState([]);

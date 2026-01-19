@@ -36,6 +36,10 @@ const router = createBrowserRouter([
         element: <ListadoDirectorFiltro />,
       },
       {
+        path: "/directors/graph",
+        element: <GraficaDirectores />,
+      },
+      {
         path: "/directors/new",
         element: <AltaDirector />,
       },
