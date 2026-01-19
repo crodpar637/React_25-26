@@ -14,6 +14,7 @@ import MovieTwoToneIcon from "@mui/icons-material/MovieTwoTone";
 import { Link } from "react-router";
 import Divider from "@mui/material/Divider";
 import ListSubheader from "@mui/material/ListSubheader";
+import styles from "../css/Impresion.module.css";
 
 function Navbar() {
   const [anclaMenuDirectores, setAnclaMenuDirectores] = React.useState(null);
@@ -41,7 +42,7 @@ function Navbar() {
   const linkStyle = { color: "black", textDecoration: "none" };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" className={styles.noprint}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* Menú para resolución xs  */}

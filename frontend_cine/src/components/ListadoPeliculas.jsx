@@ -98,7 +98,7 @@ function ListadoPeliculas() {
               <TableCell align="center">Fecha de lanzamiento</TableCell>
               <TableCell>Director</TableCell>
               <TableCell>Sinopsis</TableCell>
-              <TableCell align="center">Acciones</TableCell>
+              <TableCell align="center" className="omitir-pdf">Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -116,7 +116,7 @@ function ListadoPeliculas() {
                 >
                   {row.synopsis}
                 </TableCell>
-                <TableCell>
+                <TableCell className="omitir-pdf">
                   <Stack
                     sx={{ width: "100%" }}
                     direction={{ xs: "column", sm: "row" }}
@@ -150,7 +150,7 @@ function ListadoPeliculas() {
       <Fab
         color="secondary"
         aria-label="imprimir"
-        onClick={() => generatePDF("pdf-content", "peliculas")}
+        onClick={() => generatePDF("pdf-content", "peliculas-" +   new Date().toLocaleString("es-ES").replace(":", "-").replace(":", "-").replace(", ","_") )}
         sx={{
           position: "fixed",
           top: 85,

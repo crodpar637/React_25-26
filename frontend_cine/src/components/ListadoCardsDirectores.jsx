@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api";
+import styles from "../css/Impresion.module.css";
 
 function ListadoCardsDirectores() {
   const [datos, setDatos] = useState([]);
@@ -39,7 +40,7 @@ function ListadoCardsDirectores() {
       await api.delete("/directors/" + id_director);
 
       const datos_nuevos = datos.filter(
-        (director) => director.id_director != id_director
+        (director) => director.id_director != id_director,
       );
 
       // Actualizamos los datos de directores sin el que hemos borrado
@@ -113,7 +114,8 @@ function ListadoCardsDirectores() {
           </Grid>
         ))}
       </Grid>
-       <Fab
+      <Fab
+        className={styles.noprint}
         color="secondary"
         aria-label="imprimir"
         onClick={() => window.print()}
