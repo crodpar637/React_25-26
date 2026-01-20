@@ -182,10 +182,13 @@ function GraficaPedidos() {
           label
         >
           {datos.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell key={`cell-${index}`} fill={COLORS[(index+10) % COLORS.length]} />
           ))}
           <Label value="Unidades vendidas" offset={70} position="outside" />
           <Tooltip />
+
+
+
         </Pie>
         <Legend verticalAlign="top" height={50} />
       </PieChart>
