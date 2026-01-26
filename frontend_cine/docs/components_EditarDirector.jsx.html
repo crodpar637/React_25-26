@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/EditarDirector.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/EditarDirector.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview Componente para editar un director existente
+ * 
+ * Formulario para actualizar los datos de un director.
+ * Carga los datos actuales del director y permite modificarlos
+ * con las mismas validaciones que el formulario de alta.
+ * 
+ * @module components/EditarDirector
+ * @requires react
+ * @requires @mui/material
+ * @requires @mui/x-date-pickers
+ * @requires dayjs
+ * @requires ../api
+ */
+
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Alert from "@mui/material/Alert";
+
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+import api from "../api";
+
+/**
+ * Componente para editar un director
+ * 
+ * Características:
+ * - Obtiene el ID del director de los parámetros de ruta (useParams)
+ * - Carga los datos actuales del director al montar
+ * - Permite modificar todos los campos con validaciones
+ * - Formulario validado con reglas específicas
+ * - Diálogo modal para confirmar éxito o error
+ * - Navega a inicio tras actualización exitosa
+ * 
+ * @component
+ * @returns {JSX.Element} Formulario de edición de director
+ */
+function EditarDirector() {
+  // Hook para navegación programática
+  const navigate = useNavigate();
+  
+  // Estado del formulario
+  const [director, setDirector] = useState({
+    name: "",
+    birth_date: "",
+    biography: "",
+    photo_url: "",
+  });
+  
+  // Estado de validación de campos
+  const [isCamposValidos, setIsCamposValidos] = useState({
+    name: true,
+    birth_date: true,
+    biography: true,
+    photo_url: true,
+  });
+  
+  // Estado para controlar si se está enviando el formulario
+  const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Estado del diálogo de resultado
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
+  const [dialogSeverity, setDialogSeverity] = useState("success");
+  
+  // Obtener ID del director de los parámetros de ruta
+  const { id_director } = useParams();
+
+  /**
+   * Efecto para actualizar el director cuando isUpdating cambia a true
+   */
+  useEffect(() => {
+    async function fetchUpdateDirector() {
+      try {
+        // Enviar datos actualizados al servidor
+        await api.put(`/directors/${id_director}`, director);
+        
+        // Mostrar mensaje de éxito
+        setDialogMessage("Actualización correcta del director");
+        setDialogSeverity("success");
+        setOpenDialog(true);
+      } catch (error) {
+        // Mostrar mensaje de error
+        setDialogMessage(error.mensaje || "Error al actualizar el director");
+        setDialogSeverity("error");
+        setOpenDialog(true);
+      }
+      // Indicar que la operación ha terminado
+      setIsUpdating(false);
+    }
+
+    if (isUpdating) fetchUpdateDirector();
+  }, [isUpdating]);
+
+  /**
+   * Efecto para cargar los datos actuales del director al montar
+   */
+  useEffect(() => {
+    async function fetchDirector() {
+      try {
+        // Obtener datos del director del servidor
+        const respuesta = await api.get(`/directors/${id_director}`);
+
+        // Establecer los datos en el formulario
+        setDirector(respuesta.datos);
+      } catch (error) {
+        // Mostrar error si no se pueden recuperar los datos
+        setDialogMessage(error.mensaje || "Error al recuperar los datos del director");
+        setDialogSeverity("error");
+        setOpenDialog(true);
+      }
+    }
+
+    fetchDirector();
+  }, [id_director]);
+
+  /**
+   * Maneja los cambios en los campos del formulario
+   * @param {React.ChangeEvent} e - Evento del cambio
+   */
+  function handleChange(e) {
+    setDirector({ ...director, [e.target.name]: e.target.value });
+  }
+
+  /**
+   * Maneja el click en el botón de aceptar
+   * Valida los datos antes de enviarlos
+   */
+  function handleClick() {
+    // Evitar envíos duplicados
+    if (isUpdating) return;
+
+    if (validarDatos()) {
+      setIsUpdating(true);
+    }
+  }
+
+  /**
+   * Maneja el cierre del diálogo de resultado
+   */
+  function handleDialogClose() {
+    setOpenDialog(false);
+
+    // Si fue éxito, navegar a la página de inicio
+    if (dialogSeverity === "success") navigate("/");
+  }
+
+  /**
+   * Valida los datos del formulario
+   * @returns {boolean} true si todos los datos son válidos, false en caso contrario
+   */
+  function validarDatos() {
+    let valido = true;
+    let objetoValidacion = {
+      name: true,
+      birth_date: true,
+      biography: true,
+      photo_url: true,
+    };
+
+    // Validación del nombre: mínimo 10 caracteres
+    if (director.name.length &lt; 10) {
+      valido = false;
+      objetoValidacion.name = false;
+    }
+
+    // Validación de la biografía: mínimo 50 caracteres
+    if (director.biography.length &lt; 50) {
+      valido = false;
+      objetoValidacion.biography = false;
+    }
+
+    // Validación de la URL de la fotografía
+    if (!isValidURL(director.photo_url)) {
+      valido = false;
+      objetoValidacion.photo_url = false;
+    }
+
+    // Validación de la fecha: campo obligatorio
+    if (!director.birth_date) {
+      valido = false;
+      objetoValidacion.birth_date = false;
+    }
+    
+    // Actualizar estado de validación
+    setIsCamposValidos(objetoValidacion);
+
+    return valido;
+  }
+
+  /**
+   * Valida si una cadena es una URL válida usando expresión regular
+   * @param {string} urlString - URL a validar
+   * @returns {boolean} true si es una URL válida, false en caso contrario
+   */
+  const isValidURL = (urlString) => {
+    var patronURL = new RegExp(
+      // valida protocolo (http o https)
+      "^(https?:\\/\\/)?" +
+        // valida nombre de dominio
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" +
+        // valida OR dirección ip (v4)
+        "((\\d{1,3}\\.){3}\\d{1,3}))" +
+        // valida puerto y path
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +
+        // valida queries
+        "(\\?[;&amp;a-z\\d%_.~+=-]*)?" +
+        // valida fragment locator
+        "(\\#[-a-z\\d_]*)?$",
+      "i"
+    );
+    return !!patronURL.test(urlString);
+  };
+
+  return (
+    &lt;>
+      {/* Contenedor principal */}
+      &lt;Grid
+        container
+        spacing={2}
+        sx={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {/* Tarjeta del formulario */}
+        &lt;Grid item size={{ xs: 12, sm: 9, md: 7 }}>
+          &lt;Paper elevation={6} sx={{ mt: 3, p: 3, maxWidth: 900, mx: "auto" }}>
+            {/* Título del formulario */}
+            &lt;Typography variant="h4" align="center" sx={{ mb: 3 }}>
+              Editar director
+            &lt;/Typography>
+
+            {/* Grid con los campos */}
+            &lt;Grid
+              container
+              spacing={2}
+              sx={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {/* Campo de nombre */}
+              &lt;Grid item size={{ xs: 10 }}>
+                &lt;TextField
+                  required
+                  fullWidth
+                  id="name"
+                  label="Nombre"
+                  name="name"
+                  type="text"
+                  maxLength="100"
+                  value={director.name}
+                  onChange={handleChange}
+                  error={!isCamposValidos.name}
+                  helperText={
+                    !isCamposValidos.name &amp;&amp; "Nombre debe tener al menos 10 caracteres."
+                  }
+                />
+              &lt;/Grid>
+              
+              {/* Campo de fecha de nacimiento */}
+              &lt;Grid item size={{ xs: 10 }}>
+                &lt;LocalizationProvider
+                  dateAdapter={AdapterDayjs}
+                  adapterLocale="es"
+                >
+                  &lt;DatePicker
+                    label="Fecha de nacimiento"
+                    name="birth_date"
+                    minDate={dayjs("1800-01-01")}
+                    maxDate={dayjs()}
+                    slotProps={{
+                      textField: {
+                        required: true,
+                        error: !isCamposValidos.birth_date,
+                        helperText: !isCamposValidos.birth_date
+                          ? "La fecha es obligatoria"
+                          : "",
+                      },
+                    }}
+                    value={
+                      director.birth_date ? dayjs(director.birth_date) : null
+                    }
+                    onChange={(newValue) =>
+                      setDirector({
+                        ...director,
+                        birth_date: newValue.format("YYYY-MM-DD"),
+                      })
+                    }
+                  />
+                &lt;/LocalizationProvider>
+              &lt;/Grid>
+              
+              {/* Campo de biografía */}
+              &lt;Grid item size={{ xs: 10 }}>
+                &lt;TextField
+                  required
+                  fullWidth
+                  id="biography"
+                  label="Biografía"
+                  name="biography"
+                  type="text"
+                  multiline
+                  maxRows={4}
+                  minRows={2}
+                  maxLength="500"
+                  value={director.biography}
+                  onChange={handleChange}
+                  error={!isCamposValidos.biography}
+                  helperText={
+                    !isCamposValidos.biography &amp;&amp;
+                    "Biografía debe tener al menos 50 caracteres."
+                  }
+                />
+              &lt;/Grid>
+              
+              {/* Campo de URL de fotografía */}
+              &lt;Grid item size={{ xs: 10 }}>
+                &lt;TextField
+                  required
+                  fullWidth
+                  id="photo_url"
+                  label="URL de la fotografía"
+                  name="photo_url"
+                  type="text"
+                  maxLength="255"
+                  value={director.photo_url}
+                  onChange={handleChange}
+                  error={!isCamposValidos.photo_url}
+                  helperText={
+                    !isCamposValidos.photo_url &amp;&amp;
+                    "Ingrese una URL válida de la fotografía."
+                  }
+                />
+              &lt;/Grid>
+              
+              {/* Botón de aceptar */}
+              &lt;Grid
+                item
+                size={{ xs: 10 }}
+                sx={{ display: "flex", justifyContent: "flex-end" }}
+              >
+                &lt;Button
+                  variant="contained"
+                  sx={{ mt: 3 }}
+                  loading={isUpdating}
+                  loadingPosition="end"
+                  onClick={handleClick}
+                >
+                  Aceptar
+                &lt;/Button>
+              &lt;/Grid>
+            &lt;/Grid>
+          &lt;/Paper>
+        &lt;/Grid>
+      &lt;/Grid>
+
+      {/* Diálogo de resultado */}
+      &lt;Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        disableEscapeKeyDown
+        aria-labelledby="result-dialog-title"
+      >
+        &lt;DialogTitle id="result-dialog-title">
+          {dialogSeverity === "success" ? "Operación correcta" : "Error"}
+        &lt;/DialogTitle>
+        &lt;DialogContent dividers>
+          &lt;Alert severity={dialogSeverity} variant="filled">
+            {dialogMessage}
+          &lt;/Alert>
+        &lt;/DialogContent>
+        &lt;DialogActions>
+          &lt;Button onClick={handleDialogClose}>OK&lt;/Button>
+        &lt;/DialogActions>
+      &lt;/Dialog>
+    &lt;/>
+  );
+}
+
+export default EditarDirector;
+             </code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-api.html">api</a></li><li><a href="module-components_AltaDirector.html">components/AltaDirector</a></li><li><a href="module-components_AltaPelicula.html">components/AltaPelicula</a></li><li><a href="module-components_EditarDirector.html">components/EditarDirector</a></li><li><a href="module-components_EditarPelicula.html">components/EditarPelicula</a></li><li><a href="module-components_GraficaDirectores.html">components/GraficaDirectores</a></li><li><a href="module-components_Inicio.html">components/Inicio</a></li><li><a href="module-components_ListadoCardsDirectores.html">components/ListadoCardsDirectores</a></li><li><a href="module-components_ListadoDirectorFiltro.html">components/ListadoDirectorFiltro</a></li><li><a href="module-components_ListadoDirectores.html">components/ListadoDirectores</a></li><li><a href="module-components_ListadoDirectoresFiltroPDF.html">components/ListadoDirectoresFiltroPDF</a></li><li><a href="module-components_ListadoPeliculas.html">components/ListadoPeliculas</a></li><li><a href="module-components_ListadoPeliculasFiltro.html">components/ListadoPeliculasFiltro</a></li><li><a href="module-components_ListadoPeliculasFiltroPDF.html">components/ListadoPeliculasFiltroPDF</a></li><li><a href="module-components_Navbar.html">components/Navbar</a></li><li><a href="module-main.html">main</a></li><li><a href="module-pages_ErrorPage.html">pages/ErrorPage</a></li><li><a href="module-pages_Home.html">pages/Home</a></li><li><a href="module-utils_generatePDF.html">utils/generatePDF</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Thu Jan 22 2026 11:26:43 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

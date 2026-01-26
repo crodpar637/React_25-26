@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/ListadoDirectorFiltro.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/ListadoDirectorFiltro.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview Componente para mostrar directores con filtros avanzados
+ * 
+ * Permite filtrar directores por rango de fecha de nacimiento.
+ * Muestra resultados en tabla con opciones de editar, eliminar y descargar PDF.
+ * 
+ * @module components/ListadoDirectorFiltro
+ * @requires react
+ * @requires @mui/material
+ * @requires @react-pdf/renderer
+ * @requires ../api
+ */
+
+import ClearIcon from "@mui/icons-material/Clear";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
+import EditIcon from "@mui/icons-material/Edit";
+import { Box, Card, CardContent, Grid, Stack, TextField } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Fab from "@mui/material/Fab";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Typography from "@mui/material/Typography";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api";
+import ListadoDirectoresFiltroPDF from "./ListadoDirectoresFiltroPDF";
+
+function ListadoDirectorFiltro() {
+  const [datos, setDatos] = useState([]);
+  const [error, setError] = useState(null);
+  const [filtroFechaInicio, setFiltroFechaInicio] = useState("");
+  const [filtroFechaFin, setFiltroFechaFin] = useState("");
+  const navigate = useNavigate();
+
+  // Cargar directores
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const respuesta = await api.get("/directors/");
+
+        setDatos(respuesta.datos);
+        setError(null);
+      } catch (error) {
+        setError(error.mensaje || "No se pudo conectar al servidor");
+        setDatos([]);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  // Calcular datos filtrados con useMemo
+  const datosFiltrados = useMemo(() => {
+    let resultados = datos;
+
+    // Filtro por fecha de inicio
+    if (filtroFechaInicio) {
+      resultados = resultados.filter(
+        (director) => director.birth_date >= filtroFechaInicio
+      );
+    }
+
+    // Filtro por fecha de fin
+    if (filtroFechaFin) {
+      resultados = resultados.filter(
+        (director) => director.birth_date &lt;= filtroFechaFin
+      );
+    }
+
+    return resultados;
+  }, [datos, filtroFechaInicio, filtroFechaFin]);
+
+  async function handleDelete(id_director) {
+    try {
+      await api.delete("/directors/" + id_director);
+
+      const datos_nuevos = datos.filter(
+        (director) => director.id_director != id_director
+      );
+
+      setDatos(datos_nuevos);
+      setError(null);
+    } catch (error) {
+      setError(error.mensaje || "No se pudo conectar al servidor");
+    }
+  }
+
+  function limpiarFiltros() {
+    setFiltroFechaInicio("");
+    setFiltroFechaFin("");
+  }
+
+  if (error != null) {
+    return (
+      &lt;>
+        &lt;Typography variant="h4" align="center" sx={{ my: 3 }}>
+          Listado de directores
+        &lt;/Typography>
+        &lt;Typography variant="h5" align="center" sx={{ mt: 3 }}>
+          {error}
+        &lt;/Typography>
+      &lt;/>
+    );
+  }
+
+  return (
+    &lt;>
+      &lt;Typography variant="h4" align="center" sx={{ my: 3 }}>
+        Listado de directores con filtros
+      &lt;/Typography>
+
+      {/* Tarjeta de filtros */}
+      &lt;Card sx={{ mb: 4 }}>
+        &lt;CardContent>
+          &lt;Typography variant="h6" sx={{ mb: 2 }}>
+            Filtros
+          &lt;/Typography>
+          &lt;Grid container spacing={2} sx={{ mb: 2 }}>
+            &lt;Grid item size={{ xs: 12, md: 6 }}>
+              &lt;TextField
+                label="Fecha de nacimiento desde"
+                type="date"
+                value={filtroFechaInicio}
+                onChange={(e) => setFiltroFechaInicio(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+              />
+            &lt;/Grid>
+            &lt;Grid item size={{ xs: 12, md: 6 }}>
+              &lt;TextField
+                label="Fecha de nacimiento hasta"
+                type="date"
+                value={filtroFechaFin}
+                onChange={(e) => setFiltroFechaFin(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+              />
+            &lt;/Grid>
+            &lt;Grid size={{ xs: 12, md: 6 }}>
+              &lt;Button
+                variant="contained"
+                color="secondary"
+                onClick={limpiarFiltros}
+                fullWidth
+                startIcon={&lt;ClearIcon />}
+                sx={{ height: "100%" }}
+              >
+                Limpiar filtros
+              &lt;/Button>
+            &lt;/Grid>
+          &lt;/Grid>
+        &lt;/CardContent>
+      &lt;/Card>
+
+      {/* Mensaje si no hay directores */}
+      {(!datosFiltrados || datosFiltrados.length === 0) &amp;&amp; (
+        &lt;Typography variant="h5" align="center" sx={{ mt: 3 }}>
+          No hay directores disponibles
+        &lt;/Typography>
+      )}
+
+      {/* Tabla de directores */}
+      {datosFiltrados &amp;&amp; datosFiltrados.length > 0 &amp;&amp; (
+        &lt;TableContainer component={Paper}>
+          &lt;Table stickyHeader aria-label="directores table">
+            &lt;TableHead>
+              &lt;TableRow>
+                &lt;TableCell>Nombre&lt;/TableCell>
+                &lt;TableCell align="center">Fecha de nacimiento&lt;/TableCell>
+                &lt;TableCell>Biografía&lt;/TableCell>
+                &lt;TableCell>Fotografía&lt;/TableCell>
+                &lt;TableCell>Acciones&lt;/TableCell>
+              &lt;/TableRow>
+            &lt;/TableHead>
+            &lt;TableBody>
+              {datosFiltrados.map((row) => (
+                &lt;TableRow key={row.id_director}>
+                  &lt;TableCell>{row.name}&lt;/TableCell>
+                  &lt;TableCell align="center">{row.birth_date}&lt;/TableCell>
+                  &lt;TableCell
+                    sx={{
+                      maxWidth: "500px",
+                      textWrap: "wrap",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {row.biography}
+                  &lt;/TableCell>
+                  &lt;TableCell>
+                    &lt;Avatar alt={row.name} src={row.photo_url} />
+                  &lt;/TableCell>
+                  &lt;TableCell>
+                    &lt;Stack
+                      sx={{ width: "100%" }}
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      &lt;Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDelete(row.id_director)}
+                      >
+                        &lt;DeleteIcon />
+                      &lt;/Button>
+                      &lt;Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() =>
+                          navigate("/directors/edit/" + row.id_director)
+                        }
+                      >
+                        &lt;EditIcon />
+                      &lt;/Button>
+                    &lt;/Stack>
+                  &lt;/TableCell>
+                &lt;/TableRow>
+              ))}
+            &lt;/TableBody>
+          &lt;/Table>
+        &lt;/TableContainer>
+      )}
+
+      {datosFiltrados &amp;&amp; datosFiltrados.length > 0 &amp;&amp; (
+        &lt;Fab
+          aria-label="descargar"
+          sx={{
+            position: "fixed",
+            top: 85,
+            right: 20,
+          }}
+        >
+          &lt;PDFDownloadLink
+            document={
+              &lt;ListadoDirectoresFiltroPDF data={datosFiltrados} />
+            }
+            fileName="directores.pdf"
+          >
+            {({ loading }) => (
+              &lt;Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {loading ? (
+                  &lt;Typography sx={{ fontSize: 12 }}>...&lt;/Typography>
+                ) : (
+                  &lt;DownloadIcon />
+                )}
+              &lt;/Box>
+            )}
+          &lt;/PDFDownloadLink>
+        &lt;/Fab>
+      )}
+    &lt;/>
+  );
+}
+
+export default ListadoDirectorFiltro;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-api.html">api</a></li><li><a href="module-components_AltaDirector.html">components/AltaDirector</a></li><li><a href="module-components_AltaPelicula.html">components/AltaPelicula</a></li><li><a href="module-components_EditarDirector.html">components/EditarDirector</a></li><li><a href="module-components_EditarPelicula.html">components/EditarPelicula</a></li><li><a href="module-components_GraficaDirectores.html">components/GraficaDirectores</a></li><li><a href="module-components_Inicio.html">components/Inicio</a></li><li><a href="module-components_ListadoCardsDirectores.html">components/ListadoCardsDirectores</a></li><li><a href="module-components_ListadoDirectorFiltro.html">components/ListadoDirectorFiltro</a></li><li><a href="module-components_ListadoDirectores.html">components/ListadoDirectores</a></li><li><a href="module-components_ListadoDirectoresFiltroPDF.html">components/ListadoDirectoresFiltroPDF</a></li><li><a href="module-components_ListadoPeliculas.html">components/ListadoPeliculas</a></li><li><a href="module-components_ListadoPeliculasFiltro.html">components/ListadoPeliculasFiltro</a></li><li><a href="module-components_ListadoPeliculasFiltroPDF.html">components/ListadoPeliculasFiltroPDF</a></li><li><a href="module-components_Navbar.html">components/Navbar</a></li><li><a href="module-main.html">main</a></li><li><a href="module-pages_ErrorPage.html">pages/ErrorPage</a></li><li><a href="module-pages_Home.html">pages/Home</a></li><li><a href="module-utils_generatePDF.html">utils/generatePDF</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Thu Jan 22 2026 11:26:43 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

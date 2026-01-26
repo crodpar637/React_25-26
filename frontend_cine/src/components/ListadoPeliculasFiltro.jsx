@@ -1,3 +1,17 @@
+/**
+ * @fileoverview Componente para mostrar películas con filtros avanzados
+ * 
+ * Permite filtrar películas por rango de fecha de lanzamiento y por director.
+ * Muestra resultados en tabla con opciones de editar, eliminar y descargar PDF.
+ * Utiliza useMemo para optimizar el rendimiento de los filtros.
+ * 
+ * @module components/ListadoPeliculasFiltro
+ * @requires react
+ * @requires @mui/material
+ * @requires @react-pdf/renderer
+ * @requires ../api
+ */
+
 import { useState, useEffect, useMemo } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";

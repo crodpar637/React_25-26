@@ -1,3 +1,16 @@
+/**
+ * @fileoverview Componente para mostrar el listado de directores en una tabla
+ * 
+ * Muestra todos los directores registrados en la base de datos en formato tabla.
+ * Permite editar, eliminar y descargar los datos como PDF.
+ * 
+ * @module components/ListadoDirectores
+ * @requires react
+ * @requires @mui/material
+ * @requires ../api
+ * @requires ../utils/generatePDF
+ */
+
 import { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -19,22 +32,44 @@ import api from "../api";
 import { useNavigate } from "react-router-dom";
 import generatePDF from "../utils/generatePDF";
 
+/**
+ * Componente que muestra el listado de directores en tabla
+ * 
+ * Características:
+ * - Obtiene datos de directores del servidor al montar el componente
+ * - Muestra tabla con información: nombre, fecha nacimiento, biografía, foto
+ * - Permite eliminar directores
+ * - Permite editar directores (navega a /directors/edit/:id)
+ * - Botón flotante para descargar la tabla como PDF
+ * - Manejo de errores y estados vacíos
+ * 
+ * @component
+ * @returns {JSX.Element} Tabla de directores o mensajes de error/vacío
+ */
 function ListadoDirectores() {
+  // Estado para almacenar los directores
   const [datos, setDatos] = useState([]);
+  
+  // Estado para manejar errores
   const [error, setError] = useState(null);
+  
+  // Hook para navegación programática
   const navigate = useNavigate();
 
+  /**
+   * Efecto para cargar los directores al montar el componente
+   */
   useEffect(() => {
     async function fetchDirectores() {
       try {
+        // Obtener directores del backend
         const respuesta = await api.get("/directors/");
 
-        // Actualizamos los datos de directores
+        // Actualizar estado con los datos obtenidos
         setDatos(respuesta.datos);
-
-        // Y no tenemos errores
         setError(null);
       } catch (error) {
+        // En caso de error, mostrar mensaje
         setError(error.mensaje || "No se pudo conectar al servidor");
         setDatos([]);
       }
@@ -43,25 +78,33 @@ function ListadoDirectores() {
     fetchDirectores();
   }, []);
 
+  /**
+   * Maneja la eliminación de un director
+   * @async
+   * @function
+   * @param {number} id_director - ID del director a eliminar
+   */
   async function handleDelete(id_director) {
     try {
+      // Enviar solicitud de eliminación al servidor
       await api.delete("/directors/" + id_director);
 
+      // Filtrar el director eliminado del estado local
       const datos_nuevos = datos.filter(
         (director) => director.id_director != id_director,
       );
 
-      // Actualizamos los datos de directores sin el que hemos borrado
+      // Actualizar el estado sin el director eliminado
       setDatos(datos_nuevos);
-
-      // Y no tenemos errores
       setError(null);
     } catch (error) {
+      // Mostrar error si algo falla
       setError(error.mensaje || "No se pudo conectar al servidor");
       setDatos([]);
     }
   }
 
+  // Mostrar mensaje si hay error
   if (error != null) {
     return (
       <>
@@ -72,6 +115,7 @@ function ListadoDirectores() {
     );
   }
 
+  // Mostrar mensaje si no hay directores
   if (!datos || datos.length === 0) {
     return (
       <>
@@ -84,13 +128,17 @@ function ListadoDirectores() {
 
   return (
     <>
+      {/* Contenedor con ID para capturar como PDF */}
       <Box id="pdf-content">
+        {/* Título */}
         <Typography variant="h4" align="center" sx={{ my: 3 }}>
           Listado de directores
         </Typography>
 
+        {/* Tabla con directores */}
         <TableContainer component={Paper}>
-          <Table stickyHeader ria-label="simple table">
+          <Table stickyHeader aria-label="simple table">
+            {/* Encabezados de tabla */}
             <TableHead>
               <TableRow>
                 <TableCell>Nombre</TableCell>
@@ -100,6 +148,8 @@ function ListadoDirectores() {
                 <TableCell align="center">Acciones</TableCell>
               </TableRow>
             </TableHead>
+            
+            {/* Filas de datos */}
             <TableBody>
               {datos.map((row) => (
                 <TableRow key={row.id_director}>
@@ -125,6 +175,7 @@ function ListadoDirectores() {
                       justifyContent="center"
                       alignItems="center"
                     >
+                      {/* Botón para eliminar */}
                       <Button
                         variant="contained"
                         color="error"
@@ -133,6 +184,7 @@ function ListadoDirectores() {
                         <DeleteIcon />
                       </Button>
 
+                      {/* Botón para editar */}
                       <Button
                         sx={{ ml: 1 }}
                         variant="contained"
@@ -152,6 +204,7 @@ function ListadoDirectores() {
         </TableContainer>
       </Box>
 
+      {/* Botón flotante para descargar PDF */}
       <Fab
         color="secondary"
         aria-label="imprimir"

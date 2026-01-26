@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: App.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: App.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview Componente raíz de la aplicación con configuración de enrutamiento
+ * 
+ * Define la estructura de rutas principal de la aplicación de gestión de cine.
+ * Utiliza React Router v7 para manejar la navegación entre diferentes vistas
+ * (directores, películas, inicio, etc.)
+ * 
+ * @module App
+ * @requires react-router-dom
+ */
+
+import { RouterProvider } from "react-router/dom";
+import { createBrowserRouter } from "react-router";
+
+// Componentes de la página principal
+import Inicio from "./components/Inicio";
+import ListadoDirectores from "./components/ListadoDirectores";
+import AltaDirector from "./components/AltaDirector";
+import EditarDirector from "./components/EditarDirector"
+import ListadoCardsDirectores from "./components/ListadoCardsDirectores";
+import ListadoDirectorFiltro from "./components/ListadoDirectorFiltro";
+import ListadoPeliculas from "./components/ListadoPeliculas";
+import ListadoPeliculasFiltro from "./components/ListadoPeliculasFiltro";
+import EditarPelicula from "./components/EditarPelicula";
+import AltaPelicula from "./components/AltaPelicula";
+import GraficaDirectores from "./components/GraficaDirectores";
+
+// Páginas de layout
+import Home from "./pages/Home";
+import ErrorPage from "./pages/ErrorPage";
+
+/**
+ * Configuración de rutas de la aplicación
+ * 
+ * Estructura:
+ * - Ruta raíz "/" carga el layout Home con navbar
+ * - Subrutas para directores (listado, alta, edición, filtros, gráfica)
+ * - Subrutas para películas (listado, alta, edición, filtros)
+ * - Página de error centralizada
+ * 
+ * @type {Router}
+ */
+const router = createBrowserRouter([
+  {
+    path: "/",
+    Component: Home,
+    errorElement: &lt;ErrorPage />,
+    children: [
+      // Ruta raíz - Página de inicio
+      { index: true, Component: Inicio },
+      
+      // Rutas de Directores
+      {
+        path: "/directors",
+        element: &lt;ListadoDirectores/>,
+      },
+      {
+        path: "/directors/cards",
+        element: &lt;ListadoCardsDirectores />,
+      },
+      {
+        path: "/directors/filter",
+        element: &lt;ListadoDirectorFiltro />,
+      },
+      {
+        path: "/directors/graph",
+        element: &lt;GraficaDirectores />,
+      },
+      {
+        path: "/directors/new",
+        element: &lt;AltaDirector />,
+      },
+      {
+        path: "/directors/edit/:id_director",
+        element: &lt;EditarDirector />,
+      },
+      
+      // Rutas de Películas
+      {
+        path: "/movies",
+        element: &lt;ListadoPeliculas/>,
+      },
+      {
+        path: "/movies/filter",
+        element: &lt;ListadoPeliculasFiltro/>,
+      },
+      {
+        path: "/movies/edit/:id_movie",
+        element: &lt;EditarPelicula/>,
+      },
+      {
+        path: "/movies/new",
+        element: &lt;AltaPelicula/>,
+      },
+    ],
+  },
+]);
+
+/**
+ * Componente raíz de la aplicación
+ * 
+ * Renderiza el proveedor de rutas que habilita la navegación en toda la aplicación
+ * 
+ * @component
+ * @returns {JSX.Element} Proveedor de rutas configurado
+ */
+function App() {
+  return (
+    &lt;>
+      &lt;RouterProvider router={router} />
+    &lt;/>
+  );
+}
+
+export default App;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-api.html">api</a></li><li><a href="module-components_AltaDirector.html">components/AltaDirector</a></li><li><a href="module-components_AltaPelicula.html">components/AltaPelicula</a></li><li><a href="module-components_EditarDirector.html">components/EditarDirector</a></li><li><a href="module-components_EditarPelicula.html">components/EditarPelicula</a></li><li><a href="module-components_GraficaDirectores.html">components/GraficaDirectores</a></li><li><a href="module-components_Inicio.html">components/Inicio</a></li><li><a href="module-components_ListadoCardsDirectores.html">components/ListadoCardsDirectores</a></li><li><a href="module-components_ListadoDirectorFiltro.html">components/ListadoDirectorFiltro</a></li><li><a href="module-components_ListadoDirectores.html">components/ListadoDirectores</a></li><li><a href="module-components_ListadoDirectoresFiltroPDF.html">components/ListadoDirectoresFiltroPDF</a></li><li><a href="module-components_ListadoPeliculas.html">components/ListadoPeliculas</a></li><li><a href="module-components_ListadoPeliculasFiltro.html">components/ListadoPeliculasFiltro</a></li><li><a href="module-components_ListadoPeliculasFiltroPDF.html">components/ListadoPeliculasFiltroPDF</a></li><li><a href="module-components_Navbar.html">components/Navbar</a></li><li><a href="module-main.html">main</a></li><li><a href="module-pages_ErrorPage.html">pages/ErrorPage</a></li><li><a href="module-pages_Home.html">pages/Home</a></li><li><a href="module-utils_generatePDF.html">utils/generatePDF</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Thu Jan 22 2026 11:26:43 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

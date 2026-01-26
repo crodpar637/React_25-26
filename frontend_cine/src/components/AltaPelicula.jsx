@@ -1,3 +1,18 @@
+/**
+ * @fileoverview Componente para crear una nueva película
+ * 
+ * Formulario para registrar una nueva película con validaciones.
+ * Requiere seleccionar un director existente y proporcionar datos de la película:
+ * título (mín 3 chars), sinopsis (mín 20 chars) y fecha de lanzamiento.
+ * 
+ * @module components/AltaPelicula
+ * @requires react
+ * @requires @mui/material
+ * @requires @mui/x-date-pickers
+ * @requires dayjs
+ * @requires ../api
+ */
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
@@ -20,33 +35,68 @@ import dayjs from "dayjs";
 import "dayjs/locale/es";
 import api from "../api";
 
+/**
+ * Componente para crear una nueva película
+ * 
+ * Características:
+ * - Carga lista de directores disponibles al montar
+ * - Formulario con validaciones específicas
+ * - Selector de director con dropdown
+ * - DatePicker para fecha de lanzamiento
+ * - Diálogo modal para confirmar éxito o error
+ * - Navega a inicio tras creación exitosa
+ * 
+ * Validaciones:
+ * - Título: mínimo 3 caracteres
+ * - Sinopsis: mínimo 20 caracteres
+ * - Fecha: campo obligatorio (entre 1800 y hoy)
+ * - Director: debe seleccionar un director válido
+ * 
+ * @component
+ * @returns {JSX.Element} Formulario de alta de película
+ */
 function AltaPelicula() {
+  // Hook para navegación programática
   const navigate = useNavigate();
+  
+  // Estado del formulario
   const [pelicula, setPelicula] = useState({
     title: "",
     synopsis: "",
     release_date: "",
     id_director: "",
   });
+  
+  // Estado para almacenar directores disponibles
   const [directores, setDirectores] = useState([]);
+  
+  // Estado de validación de campos
   const [isCamposValidos, setIsCamposValidos] = useState({
     title: true,
     synopsis: true,
     release_date: true,
     id_director: true,
   });
+  
+  // Estado para controlar si se está enviando el formulario
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Estado del diálogo de resultado
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [dialogSeverity, setDialogSeverity] = useState("success");
 
-  // Cargar directores
+  /**
+   * Efecto para cargar la lista de directores disponibles
+   */
   useEffect(() => {
     async function fetchDirectores() {
       try {
+        // Obtener lista de directores del servidor
         const respuesta = await api.get("/directors/");
         setDirectores(respuesta.datos);
       } catch (error) {
+        // Mostrar error si no se pueden recuperar los directores
         setDialogMessage(
           error.mensaje || "Error al recuperar los directores"
         );
@@ -58,32 +108,48 @@ function AltaPelicula() {
     fetchDirectores();
   }, []);
 
+  /**
+   * Efecto para crear la película cuando isUpdating cambia a true
+   */
   useEffect(() => {
     async function fetchCreatePelicula() {
       try {
+        // Enviar datos de la película al servidor
         const respuesta = await api.post("/movies/", pelicula);
 
+        // Mostrar mensaje de éxito
         setDialogMessage(respuesta.mensaje);
         setDialogSeverity("success");
         setOpenDialog(true);
       } catch (error) {
+        // Mostrar mensaje de error
         setDialogMessage(
           error.mensaje || "Error al crear la película"
         );
         setDialogSeverity("error");
         setOpenDialog(true);
       }
+      // Indicar que la operación ha terminado
       setIsUpdating(false);
     }
 
     if (isUpdating) fetchCreatePelicula();
   }, [isUpdating]);
 
+  /**
+   * Maneja los cambios en los campos del formulario
+   * @param {React.ChangeEvent} e - Evento del cambio
+   */
   function handleChange(e) {
     setPelicula({ ...pelicula, [e.target.name]: e.target.value });
   }
 
+  /**
+   * Maneja el click en el botón de aceptar
+   * Valida los datos antes de enviarlos
+   */
   function handleClick() {
+    // Evitar envíos duplicados
     if (isUpdating) return;
 
     if (validarDatos()) {
@@ -91,12 +157,20 @@ function AltaPelicula() {
     }
   }
 
+  /**
+   * Maneja el cierre del diálogo de resultado
+   */
   function handleDialogClose() {
     setOpenDialog(false);
 
+    // Si fue éxito, navegar a la página de inicio
     if (dialogSeverity === "success") navigate("/");
   }
 
+  /**
+   * Valida los datos del formulario
+   * @returns {boolean} true si todos los datos son válidos, false en caso contrario
+   */
   function validarDatos() {
     let valido = true;
     let objetoValidacion = {
@@ -106,30 +180,31 @@ function AltaPelicula() {
       id_director: true,
     };
 
-    // Validación del título
+    // Validación del título: mínimo 3 caracteres
     if (pelicula.title.length < 3) {
       valido = false;
       objetoValidacion.title = false;
     }
 
-    // Validación de la sinopsis
+    // Validación de la sinopsis: mínimo 20 caracteres
     if (pelicula.synopsis.length < 20) {
       valido = false;
       objetoValidacion.synopsis = false;
     }
 
-    // Validación de la fecha como requerida
+    // Validación de la fecha: campo obligatorio
     if (!pelicula.release_date) {
       valido = false;
       objetoValidacion.release_date = false;
     }
 
-    // Validación del director
+    // Validación del director: debe seleccionar uno
     if (!pelicula.id_director) {
       valido = false;
       objetoValidacion.id_director = false;
     }
 
+    // Actualizar estado de validación
     setIsCamposValidos(objetoValidacion);
 
     return valido;
@@ -137,6 +212,7 @@ function AltaPelicula() {
 
   return (
     <>
+      {/* Contenedor principal */}
       <Grid
         container
         spacing={2}
@@ -145,12 +221,15 @@ function AltaPelicula() {
           alignItems: "center",
         }}
       >
+        {/* Tarjeta del formulario */}
         <Grid item size={{ xs: 12, sm: 9, md: 7 }}>
           <Paper elevation={6} sx={{ mt: 3, p: 3, maxWidth: 900, mx: "auto" }}>
+            {/* Título del formulario */}
             <Typography variant="h4" align="center" sx={{ mb: 3 }}>
               Alta de película
             </Typography>
 
+            {/* Grid con los campos */}
             <Grid
               container
               spacing={2}
@@ -159,6 +238,7 @@ function AltaPelicula() {
                 alignItems: "center",
               }}
             >
+              {/* Campo de título */}
               <Grid item size={{ xs: 10 }}>
                 <TextField
                   required
@@ -173,11 +253,12 @@ function AltaPelicula() {
                   error={!isCamposValidos.title}
                   helperText={
                     !isCamposValidos.title &&
-                    "Compruebe el formato del título."
+                    "Título debe tener al menos 3 caracteres."
                   }
                 />
               </Grid>
 
+              {/* Campo de fecha de lanzamiento */}
               <Grid item size={{ xs: 10 }}>
                 <LocalizationProvider
                   dateAdapter={AdapterDayjs}
@@ -213,6 +294,7 @@ function AltaPelicula() {
                 </LocalizationProvider>
               </Grid>
 
+              {/* Campo de selección de director */}
               <Grid item size={{ xs: 10 }}>
                 <TextField
                   select
@@ -243,6 +325,7 @@ function AltaPelicula() {
                 </TextField>
               </Grid>
 
+              {/* Campo de sinopsis */}
               <Grid item size={{ xs: 10 }}>
                 <TextField
                   required
@@ -260,11 +343,12 @@ function AltaPelicula() {
                   error={!isCamposValidos.synopsis}
                   helperText={
                     !isCamposValidos.synopsis &&
-                    "Compruebe el formato de la sinopsis."
+                    "Sinopsis debe tener al menos 20 caracteres."
                   }
                 />
               </Grid>
 
+              {/* Botón de aceptar */}
               <Grid
                 item
                 size={{ xs: 10 }}
@@ -285,6 +369,7 @@ function AltaPelicula() {
         </Grid>
       </Grid>
 
+      {/* Diálogo de resultado */}
       <Dialog
         open={openDialog}
         onClose={handleDialogClose}
@@ -308,3 +393,4 @@ function AltaPelicula() {
 }
 
 export default AltaPelicula;
+              

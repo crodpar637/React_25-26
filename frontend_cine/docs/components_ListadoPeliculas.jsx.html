@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/ListadoPeliculas.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/ListadoPeliculas.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview Componente para mostrar el listado de películas en una tabla
+ * 
+ * Muestra todas las películas registradas en la base de datos en formato tabla.
+ * Permite editar, eliminar y descargar los datos como PDF con timestamp.
+ * 
+ * @module components/ListadoPeliculas
+ * @requires react
+ * @requires @mui/material
+ * @requires ../api
+ * @requires ../utils/generatePDF
+ */
+
+import { useState, useEffect } from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import PrintIcon from "@mui/icons-material/Print";
+import Fab from "@mui/material/Fab";
+import { Stack, Box } from "@mui/material";
+import api from "../api";
+import { useNavigate } from "react-router-dom";
+import generatePDF from "../utils/generatePDF";
+
+/**
+ * Componente que muestra el listado de películas en tabla
+ * 
+ * Características:
+ * - Obtiene datos de películas del servidor al montar el componente
+ * - Muestra tabla con información: título, fecha lanzamiento, director, sinopsis
+ * - Permite eliminar películas
+ * - Permite editar películas (navega a /movies/edit/:id)
+ * - Botón flotante para descargar la tabla como PDF con timestamp
+ * - Manejo de errores y estados vacíos
+ * 
+ * @component
+ * @returns {JSX.Element} Tabla de películas o mensajes de error/vacío
+ */
+function ListadoPeliculas() {
+  // Estado para almacenar las películas
+  const [datos, setDatos] = useState([]);
+  
+  // Estado para manejar errores
+  const [error, setError] = useState(null);
+  
+  // Hook para navegación programática
+  const navigate = useNavigate();
+
+  /**
+   * Efecto para cargar las películas al montar el componente
+   */
+  useEffect(() => {
+    async function fetchPeliculas() {
+      try {
+        // Obtener películas del backend
+        const respuesta = await api.get("/movies/");
+
+        // Actualizar estado con los datos obtenidos
+        setDatos(respuesta.datos);
+        setError(null);
+      } catch (error) {
+        // En caso de error, mostrar mensaje
+        setError(error.mensaje || "No se pudo conectar al servidor");
+        setDatos([]);
+      }
+    }
+
+    fetchPeliculas();
+  }, []);
+
+  /**
+   * Maneja la eliminación de una película
+   * @async
+   * @function
+   * @param {number} id_movie - ID de la película a eliminar
+   */
+  async function handleDelete(id_movie) {
+    try {
+      // Enviar solicitud de eliminación al servidor
+      await api.delete("/movies/" + id_movie);
+
+      // Filtrar la película eliminada del estado local
+      const datos_nuevos = datos.filter(
+        (pelicula) => pelicula.id_movie != id_movie,
+      );
+
+      // Actualizar el estado sin la película eliminada
+      setDatos(datos_nuevos);
+      setError(null);
+    } catch (error) {
+      // Mostrar error si algo falla
+      setError(error.mensaje || "No se pudo conectar al servidor");
+      setDatos([]);
+    }
+  }
+
+  // Mostrar mensaje si hay error
+  if (error != null) {
+    return (
+      &lt;>
+        &lt;Typography variant="h4" align="center" sx={{ my: 3 }}>
+          Listado de películas
+        &lt;/Typography>
+        &lt;Typography variant="h5" align="center" sx={{ mt: 3 }}>
+          {error}
+        &lt;/Typography>
+      &lt;/>
+    );
+  }
+
+  // Mostrar mensaje si no hay películas
+  if (!datos || datos.length === 0) {
+    return (
+      &lt;>
+        &lt;Typography variant="h5" align="center" sx={{ mt: 3 }}>
+          No hay películas disponibles
+        &lt;/Typography>
+      &lt;/>
+    );
+  }
+
+  return (
+    &lt;>
+      {/* Contenedor con ID para capturar como PDF */}
+      &lt;Box id="pdf-content">
+        {/* Título */}
+        &lt;Typography variant="h4" align="center" sx={{ my: 3 }}>
+          Listado de películas
+        &lt;/Typography>
+
+        {/* Tabla con películas */}
+        &lt;TableContainer component={Paper}>
+          &lt;Table stickyHeader aria-label="películas table">
+            {/* Encabezados de tabla */}
+            &lt;TableHead>
+              &lt;TableRow>
+                &lt;TableCell>Título&lt;/TableCell>
+                &lt;TableCell align="center">Fecha de lanzamiento&lt;/TableCell>
+                &lt;TableCell>Director&lt;/TableCell>
+                &lt;TableCell>Sinopsis&lt;/TableCell>
+                &lt;TableCell align="center" className="omitir-pdf">Acciones&lt;/TableCell>
+              &lt;/TableRow>
+            &lt;/TableHead>
+            
+            {/* Filas de datos */}
+            &lt;TableBody>
+              {datos.map((row) => (
+                &lt;TableRow key={row.id_movie}>
+                  &lt;TableCell>{row.title}&lt;/TableCell>
+                  &lt;TableCell align="center">{row.release_date}&lt;/TableCell>
+                  &lt;TableCell>{row.id_director_director.name}&lt;/TableCell>
+                  &lt;TableCell
+                    sx={{
+                      maxWidth: "500px",
+                      textWrap: "wrap",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {row.synopsis}
+                  &lt;/TableCell>
+                  &lt;TableCell className="omitir-pdf">
+                    &lt;Stack
+                      sx={{ width: "100%" }}
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      {/* Botón para eliminar */}
+                      &lt;Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDelete(row.id_movie)}
+                      >
+                        &lt;DeleteIcon />
+                      &lt;/Button>
+                      
+                      {/* Botón para editar */}
+                      &lt;Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => navigate("/movies/edit/" + row.id_movie)}
+                      >
+                        &lt;EditIcon />
+                      &lt;/Button>
+                    &lt;/Stack>
+                  &lt;/TableCell>
+                &lt;/TableRow>
+              ))}
+            &lt;/TableBody>
+          &lt;/Table>
+        &lt;/TableContainer>
+      &lt;/Box>
+
+      {/* Botón flotante para descargar PDF con timestamp */}
+      &lt;Fab
+        color="secondary"
+        aria-label="imprimir"
+        onClick={() => generatePDF("pdf-content", "peliculas-" +   new Date().toLocaleString("es-ES").replace(":", "-").replace(":", "-").replace(", ","_") )}
+        sx={{
+          position: "fixed",
+          top: 85,
+          right: 20,
+        }}
+      >
+        &lt;PrintIcon />
+      &lt;/Fab>
+    &lt;/>
+  );
+}
+
+export default ListadoPeliculas;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-api.html">api</a></li><li><a href="module-components_AltaDirector.html">components/AltaDirector</a></li><li><a href="module-components_AltaPelicula.html">components/AltaPelicula</a></li><li><a href="module-components_EditarDirector.html">components/EditarDirector</a></li><li><a href="module-components_EditarPelicula.html">components/EditarPelicula</a></li><li><a href="module-components_GraficaDirectores.html">components/GraficaDirectores</a></li><li><a href="module-components_Inicio.html">components/Inicio</a></li><li><a href="module-components_ListadoCardsDirectores.html">components/ListadoCardsDirectores</a></li><li><a href="module-components_ListadoDirectorFiltro.html">components/ListadoDirectorFiltro</a></li><li><a href="module-components_ListadoDirectores.html">components/ListadoDirectores</a></li><li><a href="module-components_ListadoDirectoresFiltroPDF.html">components/ListadoDirectoresFiltroPDF</a></li><li><a href="module-components_ListadoPeliculas.html">components/ListadoPeliculas</a></li><li><a href="module-components_ListadoPeliculasFiltro.html">components/ListadoPeliculasFiltro</a></li><li><a href="module-components_ListadoPeliculasFiltroPDF.html">components/ListadoPeliculasFiltroPDF</a></li><li><a href="module-components_Navbar.html">components/Navbar</a></li><li><a href="module-main.html">main</a></li><li><a href="module-pages_ErrorPage.html">pages/ErrorPage</a></li><li><a href="module-pages_Home.html">pages/Home</a></li><li><a href="module-utils_generatePDF.html">utils/generatePDF</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Thu Jan 22 2026 11:26:43 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

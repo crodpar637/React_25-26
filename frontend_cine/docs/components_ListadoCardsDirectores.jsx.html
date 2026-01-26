@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/ListadoCardsDirectores.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/ListadoCardsDirectores.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview Componente que muestra directores en tarjetas personalizadas
+ * 
+ * Alternativa visual al listado en tabla. Muestra directores como tarjetas con
+ * imagen, nombre, biografía y fecha de nacimiento. Permite editar y eliminar directores.
+ * 
+ * @module components/ListadoCardsDirectores
+ * @requires react
+ * @requires @mui/material
+ * @requires ../api
+ */
+
+import PrintIcon from "@mui/icons-material/Print";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Fab from "@mui/material/Fab";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import api from "../api";
+import styles from "../css/Impresion.module.css";
+
+/**
+ * Componente que muestra el listado de directores como tarjetas
+ * 
+ * Características:
+ * - Obtiene directores del servidor al montar el componente
+ * - Muestra cada director como una tarjeta con imagen
+ * - Tarjeta contiene: nombre, biografía, fecha de nacimiento
+ * - Acciones: editar y borrar director
+ * - Botón flotante para imprimir la página
+ * - Diseño responsivo (xs: 12, sm: 6, md: 4, lg: 3 columnas)
+ * 
+ * @component
+ * @returns {JSX.Element} Grid de tarjetas de directores o mensajes de estado
+ */
+function ListadoCardsDirectores() {
+  // Estado para almacenar los directores
+  const [datos, setDatos] = useState([]);
+  
+  // Estado para manejar errores
+  const [error, setError] = useState(null);
+
+  /**
+   * Efecto para cargar los directores al montar el componente
+   */
+  useEffect(() => {
+    async function fetchDirectores() {
+      try {
+        // Obtener directores del backend
+        const respuesta = await api.get("/directors/");
+
+        // Actualizar estado con los datos obtenidos
+        setDatos(respuesta.datos);
+        setError(null);
+      } catch (error) {
+        // En caso de error, mostrar mensaje
+        setError(error.mensaje || "No se pudo conectar al servidor");
+        setDatos([]);
+      }
+    }
+
+    fetchDirectores();
+  }, []);
+
+  /**
+   * Maneja la eliminación de un director
+   * @async
+   * @function
+   * @param {number} id_director - ID del director a eliminar
+   */
+  async function handleDelete(id_director) {
+    try {
+      // Enviar solicitud de eliminación al servidor
+      await api.delete("/directors/" + id_director);
+
+      // Filtrar el director eliminado del estado local
+      const datos_nuevos = datos.filter(
+        (director) => director.id_director != id_director,
+      );
+
+      // Actualizar el estado sin el director eliminado
+      setDatos(datos_nuevos);
+      setError(null);
+    } catch (error) {
+      // Mostrar error si algo falla
+      setError(error.mensaje || "No se pudo conectar al servidor");
+      setDatos([]);
+    }
+  }
+
+  // Mostrar mensaje si hay error
+  if (error != null) {
+    return (
+      &lt;>
+        &lt;Typography variant="h5" align="center" sx={{ mt: 3 }}>
+          {error}
+        &lt;/Typography>
+      &lt;/>
+    );
+  }
+
+  // Mostrar mensaje si no hay directores
+  if (!datos || datos.length === 0) {
+    return (
+      &lt;>
+        &lt;Typography variant="h5" align="center" sx={{ mt: 3 }}>
+          No hay directores disponibles
+        &lt;/Typography>
+      &lt;/>
+    );
+  }
+
+  return (
+    &lt;>
+      {/* Título */}
+      &lt;Typography variant="h4" align="center" sx={{ my: 3 }}>
+        Listado de directores
+      &lt;/Typography>
+      
+      {/* Grid responsivo con tarjetas */}
+      &lt;Grid container spacing={1}>
+        {datos.map((row) => (
+          &lt;Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={row.id_director}>
+            {/* Tarjeta de director */}
+            &lt;Card>
+              {/* Imagen del director */}
+              &lt;CardMedia
+                sx={{ height: 350 }}
+                image={row.photo_url}
+                title={row.name}
+              />
+              
+              {/* Contenido de la tarjeta */}
+              &lt;CardContent>
+                {/* Nombre del director */}
+                &lt;Typography gutterBottom variant="h5" component="div">
+                  {row.name}
+                &lt;/Typography>
+                
+                {/* Biografía del director */}
+                &lt;Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {row.biography}
+                &lt;/Typography>
+                
+                {/* Fecha de nacimiento */}
+                &lt;Typography variant="caption" gutterBottom>
+                  {row.birth_date}
+                &lt;/Typography>
+              &lt;/CardContent>
+              
+              {/* Botones de acciones */}
+              &lt;CardActions>
+                {/* Botón para editar */}
+                &lt;Link to={`/directors/edit/${row.id_director}`}>
+                  &lt;Button size="small">EDITAR&lt;/Button>
+                &lt;/Link>
+                
+                {/* Botón para eliminar */}
+                &lt;Button
+                  size="small"
+                  onClick={() => handleDelete(row.id_director)}
+                >
+                  BORRAR
+                &lt;/Button>
+              &lt;/CardActions>
+            &lt;/Card>
+          &lt;/Grid>
+        ))}
+      &lt;/Grid>
+      
+      {/* Botón flotante para imprimir */}
+      &lt;Fab
+        className={styles.noprint}
+        color="secondary"
+        aria-label="imprimir"
+        onClick={() => window.print()}
+        sx={{
+          position: "fixed",
+          top: 85,
+          right: 20,
+        }}
+      >
+        &lt;PrintIcon />
+      &lt;/Fab>
+    &lt;/>
+  );
+}
+
+export default ListadoCardsDirectores;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-api.html">api</a></li><li><a href="module-components_AltaDirector.html">components/AltaDirector</a></li><li><a href="module-components_AltaPelicula.html">components/AltaPelicula</a></li><li><a href="module-components_EditarDirector.html">components/EditarDirector</a></li><li><a href="module-components_EditarPelicula.html">components/EditarPelicula</a></li><li><a href="module-components_GraficaDirectores.html">components/GraficaDirectores</a></li><li><a href="module-components_Inicio.html">components/Inicio</a></li><li><a href="module-components_ListadoCardsDirectores.html">components/ListadoCardsDirectores</a></li><li><a href="module-components_ListadoDirectorFiltro.html">components/ListadoDirectorFiltro</a></li><li><a href="module-components_ListadoDirectores.html">components/ListadoDirectores</a></li><li><a href="module-components_ListadoDirectoresFiltroPDF.html">components/ListadoDirectoresFiltroPDF</a></li><li><a href="module-components_ListadoPeliculas.html">components/ListadoPeliculas</a></li><li><a href="module-components_ListadoPeliculasFiltro.html">components/ListadoPeliculasFiltro</a></li><li><a href="module-components_ListadoPeliculasFiltroPDF.html">components/ListadoPeliculasFiltroPDF</a></li><li><a href="module-components_Navbar.html">components/Navbar</a></li><li><a href="module-main.html">main</a></li><li><a href="module-pages_ErrorPage.html">pages/ErrorPage</a></li><li><a href="module-pages_Home.html">pages/Home</a></li><li><a href="module-utils_generatePDF.html">utils/generatePDF</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Thu Jan 22 2026 11:26:43 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

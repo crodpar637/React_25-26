@@ -1,3 +1,16 @@
+/**
+ * @fileoverview Componente para mostrar directores con filtros avanzados
+ * 
+ * Permite filtrar directores por rango de fecha de nacimiento.
+ * Muestra resultados en tabla con opciones de editar, eliminar y descargar PDF.
+ * 
+ * @module components/ListadoDirectorFiltro
+ * @requires react
+ * @requires @mui/material
+ * @requires @react-pdf/renderer
+ * @requires ../api
+ */
+
 import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";

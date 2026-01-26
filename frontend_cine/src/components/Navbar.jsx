@@ -1,3 +1,16 @@
+/**
+ * @fileoverview Componente de barra de navegación principal de la aplicación
+ * 
+ * Componente que proporciona navegación responsiva a todas las secciones de la aplicación.
+ * Utiliza Material-UI AppBar y menús desplegables para mostrar opciones de directores y películas.
+ * Se adapta a diferentes tamaños de pantalla (xs, md).
+ * 
+ * @module components/Navbar
+ * @requires react
+ * @requires @mui/material
+ * @requires react-router
+ */
+
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -16,36 +29,71 @@ import Divider from "@mui/material/Divider";
 import ListSubheader from "@mui/material/ListSubheader";
 import styles from "../css/Impresion.module.css";
 
+/**
+ * Componente de barra de navegación
+ * 
+ * Características:
+ * - Menú hamburguesa para resoluciones xs
+ * - Menús desplegables para directores y películas en resolución md
+ * - Logo "MOVIES DB" en la esquina superior izquierda
+ * - Navegación a todas las principales secciones de la aplicación
+ * - Estilos responsivos para diferentes tamaños de pantalla
+ * 
+ * Estado interno:
+ * - anclaMenuDirectores: Control del menú de directores
+ * - anclaMenuPeliculas: Control del menú de películas
+ * - anclaMenuXS: Control del menú hamburguesa para móviles
+ * 
+ * @component
+ * @returns {JSX.Element} Barra de navegación con menús
+ */
 function Navbar() {
+  // Estados para controlar la apertura/cierre de menús
   const [anclaMenuDirectores, setAnclaMenuDirectores] = React.useState(null);
   const [anclaMenuPeliculas, setAnclaMenuPeliculas] = React.useState(null);
   const [anclaMenuXS, setAnclaMenuXS] = React.useState(null);
 
+  /**
+   * Maneja la apertura del menú de directores
+   * @param {React.MouseEvent} event - Evento del click
+   */
   const handleClickMenuDirectores = (event) => {
     setAnclaMenuDirectores(event.currentTarget);
   };
 
+  /**
+   * Maneja la apertura del menú de películas
+   * @param {React.MouseEvent} event - Evento del click
+   */
   const handleClickMenuPeliculas = (event) => {
     setAnclaMenuPeliculas(event.currentTarget);
   };
 
+  /**
+   * Maneja la apertura del menú de móvil (xs)
+   * @param {React.MouseEvent} event - Evento del click
+   */
   const handleClickMenuXS = (event) => {
     setAnclaMenuXS(event.currentTarget);
   };
 
+  /**
+   * Cierra todos los menús abiertos
+   */
   const handleCloseNavMenu = () => {
     setAnclaMenuDirectores(null);
     setAnclaMenuPeliculas(null);
     setAnclaMenuXS(null);
   };
 
+  // Estilos para los links dentro de los menús
   const linkStyle = { color: "black", textDecoration: "none" };
 
   return (
     <AppBar position="static" className={styles.noprint}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          {/* Menú para resolución xs  */}
+          {/* Menú hamburguesa para resolución xs (móviles) */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -57,6 +105,8 @@ function Navbar() {
             >
               <MenuIcon />
             </IconButton>
+            
+            {/* Menú desplegable para xs */}
             <Menu
               id="menu-appbar-xs"
               anchorEl={anclaMenuXS}
@@ -73,6 +123,7 @@ function Navbar() {
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: "block", md: "none" } }}
             >
+              {/* Sección de Directores */}
               <ListSubheader>Menú Directores</ListSubheader>
               <MenuItem onClick={handleCloseNavMenu}>
                 <Link to="/directors/new" style={linkStyle}>
@@ -102,14 +153,18 @@ function Navbar() {
                   </Typography>
                 </Link>
               </MenuItem>
-               <MenuItem onClick={handleCloseNavMenu}>
+              <MenuItem onClick={handleCloseNavMenu}>
                 <Link to="/directors/graph" style={linkStyle}>
                   <Typography sx={{ textAlign: "center" }}>
                     Gráficas de directores
                   </Typography>
                 </Link>
               </MenuItem>
+              
+              {/* Divisor entre secciones */}
               <Divider />
+              
+              {/* Sección de Películas */}
               <ListSubheader>Menú Películas</ListSubheader>
               <MenuItem onClick={handleCloseNavMenu}>
                 <Link to="/movies/new" style={linkStyle}>
@@ -135,7 +190,7 @@ function Navbar() {
             </Menu>
           </Box>
 
-          {/* Logo y nombre de la web */}
+          {/* Logo y nombre de la aplicación */}
           <MovieTwoToneIcon />
           <Typography
             variant="h6"
@@ -154,9 +209,9 @@ function Navbar() {
             MOVIES DB
           </Typography>
 
-          {/* Menú para resolución md */}
+          {/* Menú principal para resolución md y superior */}
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {/* Menú para directores en md */}
+            {/* Botón de Directores con menú desplegable */}
             <Button
               onClick={handleClickMenuDirectores}
               sx={{ my: 2, color: "white", display: "block" }}
@@ -215,7 +270,8 @@ function Navbar() {
                 </Link>
               </MenuItem>
             </Menu>
-            {/* Menú para peliculas en md */}
+            
+            {/* Botón de Películas con menú desplegable */}
             <Button
               onClick={handleClickMenuPeliculas}
               sx={{ my: 2, color: "white", display: "block" }}
@@ -268,3 +324,4 @@ function Navbar() {
 }
 
 export default Navbar;
+           

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/ListadoPeliculasFiltroPDF.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/ListadoPeliculasFiltroPDF.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview Componente PDF para exportar listado de películas filtradas
+ * 
+ * Componente React-PDF que genera un documento PDF con tabla de películas.
+ * Utiliza StyleSheet para estilizar tabla de 5 columnas con bordes, 
+ * encabezados con color de fondo gris y truncamiento de sinopsis.
+ * 
+ * @module components/ListadoPeliculasFiltroPDF
+ * @requires @react-pdf/renderer
+ */
+
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+} from "@react-pdf/renderer";
+
+/**
+ * Estilos para el documento PDF de películas
+ * Define página, tabla, encabezados y celdas con bordes y colores
+ * Tabla de 5 columnas con ancho de 20% cada una
+ * @type {StyleSheet}
+ */
+const styles = StyleSheet.create({
+  // Estilos de página: padding interno y tamaño de fuente base
+  page: {
+    padding: 20,
+    fontSize: 9,
+  },
+  // Estilos del título: centrado, fuerte, con separación inferior
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  // Estilos de tabla: ancho completo, flexbox para filas
+  table: {
+    display: "table",
+    width: "100%",
+    // borderStyle: "solid",
+    // borderWidth: 1,
+    // borderColor: "#bfbfbf",
+    marginTop: 20,
+  },
+  // Estilos de fila: dirección horizontal
+  tableRow: {
+    margin: "auto",
+    flexDirection: "row",
+  },
+  // Estilos de encabezado: fondo gris, bordes, 20% ancho (5 columnas)
+  tableColHeader: {
+    width: "20%",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#bfbfbf",
+    backgroundColor: "#f0f0f0",
+    padding: 8,
+    fontWeight: "bold",
+  },
+  // Estilos de columna de datos: bordes, ancho proporcional
+  tableCol: {
+    width: "20%",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#bfbfbf",
+    padding: 8,
+  },
+  // Estilos de celda: tamaño de fuente reducido para tabla
+  tableCell: {
+    margin: "auto",
+    marginTop: 5,
+    fontSize: 8,
+  },
+});
+
+/**
+ * Componente PDF para exportar listado de películas
+ * 
+ * Genera un documento PDF con tabla de 5 columnas:
+ * - Título de la película
+ * - Fecha de lanzamiento
+ * - Nombre del director
+ * - Sinopsis (truncada a 60 caracteres)
+ * 
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {Array&lt;Object>} props.data - Array de películas a mostrar en la tabla
+ * @param {string} props.data[].title - Título de la película
+ * @param {string} props.data[].release_date - Fecha de lanzamiento (formato YYYY-MM-DD)
+ * @param {Object} props.data[].id_director_director - Relación con el director
+ * @param {string} props.data[].id_director_director.name - Nombre del director
+ * @param {string} props.data[].synopsis - Sinopsis de la película (se trunca a 60 caracteres)
+ * @returns {JSX.Element} Documento PDF con tabla de películas
+ */
+function ListadoPeliculasFiltroPDF({ data }) {
+  return (
+    // Documento PDF con página tamaño A4
+    &lt;Document>
+      &lt;Page size="A4" style={styles.page}>
+        {/* Título del documento PDF */}
+        &lt;View style={styles.title}>
+          &lt;Text>Listado de Películas&lt;/Text>
+        &lt;/View>
+
+        {/* Tabla principal */}
+        &lt;View style={styles.table}>
+          {/* Fila de encabezados */}
+          &lt;View style={styles.tableRow}>
+            {/* Columna: Título */}
+            &lt;View style={styles.tableColHeader}>
+              &lt;Text style={styles.tableCell}>Título&lt;/Text>
+            &lt;/View>
+            {/* Columna: Lanzamiento */}
+            &lt;View style={styles.tableColHeader}>
+              &lt;Text style={styles.tableCell}>Lanzamiento&lt;/Text>
+            &lt;/View>
+            {/* Columna: Director */}
+            &lt;View style={styles.tableColHeader}>
+              &lt;Text style={styles.tableCell}>Director&lt;/Text>
+            &lt;/View>
+            {/* Columna: Sinopsis */}
+            &lt;View style={styles.tableColHeader}>
+              &lt;Text style={styles.tableCell}>Sinopsis&lt;/Text>
+            &lt;/View>
+          &lt;/View>
+
+          {/* Renderizar filas de datos para cada película */}
+          {data.map((pelicula, index) => (
+            &lt;View style={styles.tableRow} key={index}>
+              {/* Celda: Título de la película */}
+              &lt;View style={styles.tableCol}>
+                &lt;Text style={styles.tableCell}>{pelicula.title}&lt;/Text>
+              &lt;/View>
+              {/* Celda: Fecha de lanzamiento de la película */}
+              &lt;View style={styles.tableCol}>
+                &lt;Text style={styles.tableCell}>{pelicula.release_date}&lt;/Text>
+              &lt;/View>
+              {/* Celda: Nombre del director asociado a la película */}
+              &lt;View style={styles.tableCol}>
+                &lt;Text style={styles.tableCell}>
+                  {pelicula.id_director_director.name || ""}
+                &lt;/Text>
+              &lt;/View>
+              {/* Celda: Sinopsis truncada a 60 caracteres más puntos suspensivos */}
+              &lt;View style={styles.tableCol}>
+                &lt;Text style={styles.tableCell}>
+                  {pelicula.synopsis
+                    ? pelicula.synopsis.substring(0, 60) + "..."
+                    : ""}
+                &lt;/Text>
+              &lt;/View>
+            &lt;/View>
+          ))}
+        &lt;/View>
+      &lt;/Page>
+    &lt;/Document>
+  );
+}
+
+export default ListadoPeliculasFiltroPDF;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-api.html">api</a></li><li><a href="module-components_AltaDirector.html">components/AltaDirector</a></li><li><a href="module-components_AltaPelicula.html">components/AltaPelicula</a></li><li><a href="module-components_EditarDirector.html">components/EditarDirector</a></li><li><a href="module-components_EditarPelicula.html">components/EditarPelicula</a></li><li><a href="module-components_GraficaDirectores.html">components/GraficaDirectores</a></li><li><a href="module-components_Inicio.html">components/Inicio</a></li><li><a href="module-components_ListadoCardsDirectores.html">components/ListadoCardsDirectores</a></li><li><a href="module-components_ListadoDirectorFiltro.html">components/ListadoDirectorFiltro</a></li><li><a href="module-components_ListadoDirectores.html">components/ListadoDirectores</a></li><li><a href="module-components_ListadoDirectoresFiltroPDF.html">components/ListadoDirectoresFiltroPDF</a></li><li><a href="module-components_ListadoPeliculas.html">components/ListadoPeliculas</a></li><li><a href="module-components_ListadoPeliculasFiltro.html">components/ListadoPeliculasFiltro</a></li><li><a href="module-components_ListadoPeliculasFiltroPDF.html">components/ListadoPeliculasFiltroPDF</a></li><li><a href="module-components_Navbar.html">components/Navbar</a></li><li><a href="module-main.html">main</a></li><li><a href="module-pages_ErrorPage.html">pages/ErrorPage</a></li><li><a href="module-pages_Home.html">pages/Home</a></li><li><a href="module-utils_generatePDF.html">utils/generatePDF</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Thu Jan 22 2026 11:26:43 GMT+0100 (hora estándar de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
