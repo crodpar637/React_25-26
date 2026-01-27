@@ -1,8 +1,97 @@
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import api from "../api";
 
 
+function EditorNotas() {
+  // Estado del formulario
+  const [nota, setNota] = useState({
+    titulo: "",
+    texto: "",
+    urlimagen: "",
+  });
 
-function EditorNotas(){
-return ( 
+  // Obtener ID de la nota de los parámetros de ruta
+  const { idnota } = useParams();
+
+ // Estado para controlar si se está enviando el formulario
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const navigate = useNavigate();
+
+  /**
+   * Efecto para cargar los datos actuales del director según el parámetro de la ruta
+   */
+  useEffect(() => {
+    async function fetchNota() {
+      try {
+        // Obtener datos de la nota del servidor
+        const respuesta = await api.get(`/notas/${idnota}`);
+
+        // Establecer los datos en el formulario
+        setNota(respuesta.datos);
+      } catch (error) {
+        // Mostrar error si no se pueden recuperar los datos
+        alert(error.mensaje || "Error al recuperar los datos de la nota");
+
+      }
+    }
+
+    fetchNota();
+  }, [idnota]);
+
+/**
+   * Efecto para actualizar la nota cuando isUpdating cambia a true
+   */
+  useEffect(() => {
+    async function fetchUpdateNota() {
+      try {
+        // Enviar datos actualizados al servidor
+        await api.put(`/notas/${idnota}`, nota);
+        
+        // Mostrar mensaje de éxito
+       alert("Actualización correcta de la nota");
+
+       navigate("/");
+
+       
+      } catch (error) {
+        // Mostrar mensaje de error
+        alert(error.mensaje || "Error al actualizar nota");
+       
+      }
+      // Indicar que la operación ha terminado
+      setIsUpdating(false);
+    }
+
+    if (isUpdating) fetchUpdateNota();
+  }, [isUpdating]);
+
+/**
+   * Maneja el click en el botón de aceptar
+   * Valida los datos antes de enviarlos
+   */
+  function handleClick() {
+    // Evitar envíos duplicados
+    if (isUpdating) return;
+
+    setIsUpdating(true);
+  }
+
+/**
+   * Maneja los cambios en los campos del formulario
+   * @param {React.ChangeEvent} e - Evento del cambio
+   */
+   function handleChange(e) {
+    setNota({ ...nota, [e.target.name]: e.target.value });
+  }
+
+  return (
     <>
       {/* Contenedor principal */}
       <Grid
@@ -44,9 +133,9 @@ return (
                   onChange={handleChange}
                 />
               </Grid>
-              
+
               {/* Campo de texto */}
-              
+
               {/* Campo de biografía */}
               <Grid item size={{ xs: 10 }}>
                 <TextField
@@ -64,22 +153,22 @@ return (
                   onChange={handleChange}
                 />
               </Grid>
-              
+
               {/* Campo de URL de fotografía */}
               <Grid item size={{ xs: 10 }}>
                 <TextField
                   required
                   fullWidth
-                  id="photo_url"
+                  id="urlimagen"
                   label="URL de la fotografía"
-                  name="photo_url"
+                  name="urlimagen"
                   type="text"
                   maxLength="255"
                   value={nota.urlimagen}
                   onChange={handleChange}
                 />
               </Grid>
-              
+
               {/* Botón de aceptar */}
               <Grid
                 item
@@ -100,7 +189,8 @@ return (
           </Paper>
         </Grid>
       </Grid>
-</>)
+    </>
+  );
 }
 
 export default EditorNotas;

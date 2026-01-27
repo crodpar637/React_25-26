@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router";
 import Home from "./pages/Home.jsx"
 import ErrorPage from "./pages/ErrorPage";
 import VisorNotas from "./components/VisorNotas.jsx";
+import EditorNotas from "./components/EditorNotas.jsx";
 
 const router = createBrowserRouter([
   {
@@ -19,8 +20,8 @@ const router = createBrowserRouter([
         element: <VisorNotas/>,
       },
       {
-        path: "/ejercicio3/:id",
-        element:  <h1>Ejercicio3</h1>,
+        path: "/ejercicio3/:idnota",
+        element:  <EditorNotas/>,
       },
     ],
   },
